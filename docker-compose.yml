@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  schoolmanagement-api:
+    image: schoolmanagement-api:latest
+    container_name: schoolmanagement-api
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "5000:8080"
+      - "5001:8081"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:8080
+      - Serilog__MinimumLevel__Default=Information
+      - Serilog__WriteTo__0__Name=Console
+    volumes:
+      # Mount logs directory for persistence
+      - ./logs:/app/Logs
+    restart: unless-stopped
+    networks:
+      - schoolmanagement-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
+
+networks:
+  schoolmanagement-network:
+    driver: bridge
+
+volumes:
+  logs:
+    driver: local

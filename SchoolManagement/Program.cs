@@ -7,6 +7,7 @@ using SchoolManagement.Middleware;
 using Serilog;
 using Asp.Versioning;
 using Asp.Versioning.Builder;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 
 // Configure Serilog
 Log.Logger = new LoggerConfiguration()
@@ -75,6 +76,10 @@ try
     builder.Services.AddScoped<IStudentService, StudentService>();
     builder.Services.AddScoped<ISchoolClassService, SchoolClassService>();
 
+    // Add health checks
+    builder.Services.AddHealthChecks()
+        .AddCheck("self", () => HealthCheckResult.Healthy("API is running"), tags: new[] { "ready" });
+
     var app = builder.Build();
 
     // Use global exception handler (must be early in pipeline)
@@ -116,6 +121,9 @@ try
     
     app.MapSchoolClassEndpoints()
         .WithApiVersionSet(apiVersionSet);
+
+    // Map health check endpoints
+    app.MapHealthEndpoints();
 
     // Test endpoints (remove in production)
     if (app.Environment.IsDevelopment())

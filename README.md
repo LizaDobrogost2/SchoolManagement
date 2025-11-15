@@ -21,16 +21,26 @@
 
 ## Quick Start
 
+### Using .NET CLI
+
 ```bash
 cd SchoolManagement
 dotnet run
 ```
 
+### Using Docker
+
+```bash
+# Using Docker Compose
+docker-compose up -d
+
 Then open your browser to:
-- **Swagger UI**: `https://localhost:5001/swagger`
-- **API Base URL**: `https://localhost:5001/api/v1`
+- **Swagger UI**: `https://localhost:5001/swagger` (.NET) or `http://localhost:5000/swagger` (Docker)
+- **API Base URL**: `https://localhost:5001/api/v1` (.NET) or `http://localhost:5000/api/v1` (Docker)
+- **Health Check**: `http://localhost:5000/health` (Docker)
 
 See **[QUICKSTART.md](QUICKSTART.md)** for detailed testing examples.
+See **[DOCKER_GUIDE.md](DOCKER_GUIDE.md)** for complete Docker documentation.
 
 ## Testing
 
