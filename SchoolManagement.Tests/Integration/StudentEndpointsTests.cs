@@ -34,14 +34,16 @@ public class StudentEndpointsTests : IClassFixture<WebApplicationFactory<Program
     public async Task CreateStudent_WithValidData_ShouldReturnCreated()
     {
         // Arrange
-        var newStudent = new CreateStudentDto
-        {
-            StudentId = $"TEST{Guid.NewGuid():N}".Substring(0, 10),
-            Name = "Integration",
-            Surname = "Test",
-            DateOfBirth = new DateTime(2005, 1, 1),
-            City = "TestCity"
-        };
+        var studentId = $"TEST{Guid.NewGuid():N}".Substring(0, 10);
+        var newStudent = new CreateStudentDto(
+            StudentId: studentId,
+            Name: "Integration",
+            Surname: "Test",
+            DateOfBirth: new DateTime(2005, 1, 1),
+            City: "TestCity",
+            Street: null,
+            PostalCode: null
+        );
 
         // Act
         var response = await _client.PostAsJsonAsync("/api/v1/students", newStudent);
@@ -59,13 +61,15 @@ public class StudentEndpointsTests : IClassFixture<WebApplicationFactory<Program
     {
         // Arrange
         var studentId = $"DUP{Guid.NewGuid():N}".Substring(0, 10);
-        var student = new CreateStudentDto
-        {
-            StudentId = studentId,
-            Name = "Duplicate",
-            Surname = "Test",
-            DateOfBirth = new DateTime(2005, 1, 1)
-        };
+        var student = new CreateStudentDto(
+            StudentId: studentId,
+            Name: "Duplicate",
+            Surname: "Test",
+            DateOfBirth: new DateTime(2005, 1, 1),
+            City: null,
+            Street: null,
+            PostalCode: null
+        );
 
         // Create first student
         await _client.PostAsJsonAsync("/api/v1/students", student);
@@ -82,13 +86,15 @@ public class StudentEndpointsTests : IClassFixture<WebApplicationFactory<Program
     {
         // Arrange
         var studentId = $"GET{Guid.NewGuid():N}".Substring(0, 10);
-        var newStudent = new CreateStudentDto
-        {
-            StudentId = studentId,
-            Name = "GetTest",
-            Surname = "Student",
-            DateOfBirth = new DateTime(2005, 1, 1)
-        };
+        var newStudent = new CreateStudentDto(
+            StudentId: studentId,
+            Name: "GetTest",
+            Surname: "Student",
+            DateOfBirth: new DateTime(2005, 1, 1),
+            City: null,
+            Street: null,
+            PostalCode: null
+        );
 
         await _client.PostAsJsonAsync("/api/v1/students", newStudent);
 
@@ -117,23 +123,26 @@ public class StudentEndpointsTests : IClassFixture<WebApplicationFactory<Program
     {
         // Arrange
         var studentId = $"UPD{Guid.NewGuid():N}".Substring(0, 10);
-        var newStudent = new CreateStudentDto
-        {
-            StudentId = studentId,
-            Name = "Original",
-            Surname = "Name",
-            DateOfBirth = new DateTime(2005, 1, 1)
-        };
+        var newStudent = new CreateStudentDto(
+            StudentId: studentId,
+            Name: "Original",
+            Surname: "Name",
+            DateOfBirth: new DateTime(2005, 1, 1),
+            City: null,
+            Street: null,
+            PostalCode: null
+        );
 
         await _client.PostAsJsonAsync("/api/v1/students", newStudent);
 
-        var updateDto = new UpdateStudentDto
-        {
-            Name = "Updated",
-            Surname = "Name",
-            DateOfBirth = new DateTime(2005, 1, 1),
-            City = "UpdatedCity"
-        };
+        var updateDto = new UpdateStudentDto(
+            Name: "Updated",
+            Surname: "Name",
+            DateOfBirth: new DateTime(2005, 1, 1),
+            City: "UpdatedCity",
+            Street: null,
+            PostalCode: null
+        );
 
         // Act
         var response = await _client.PutAsJsonAsync($"/api/v1/students/{studentId}", updateDto);
@@ -150,21 +159,27 @@ public class StudentEndpointsTests : IClassFixture<WebApplicationFactory<Program
     {
         // Arrange
         var studentId = $"PAT{Guid.NewGuid():N}".Substring(0, 10);
-        var newStudent = new CreateStudentDto
-        {
-            StudentId = studentId,
-            Name = "Patch",
-            Surname = "Test",
-            DateOfBirth = new DateTime(2005, 1, 1),
-            City = "OriginalCity"
-        };
+        var newStudent = new CreateStudentDto(
+            StudentId: studentId,
+            Name: "Patch",
+            Surname: "Test",
+            DateOfBirth: new DateTime(2005, 1, 1),
+            City: "OriginalCity",
+            Street: null,
+            PostalCode: null
+        );
 
         await _client.PostAsJsonAsync("/api/v1/students", newStudent);
 
-        var patchDto = new PatchStudentDto
-        {
-            City = "PatchedCity"
-        };
+        var patchDto = new PatchStudentDto(
+            Name: null,
+            Surname: null,
+            DateOfBirth: null,
+            City: "PatchedCity",
+            Street: null,
+            PostalCode: null,
+            SchoolClassId: null
+        );
 
         // Act
         var response = await _client.PatchAsJsonAsync($"/api/v1/students/{studentId}", patchDto);
@@ -181,13 +196,15 @@ public class StudentEndpointsTests : IClassFixture<WebApplicationFactory<Program
     {
         // Arrange
         var studentId = $"DEL{Guid.NewGuid():N}".Substring(0, 10);
-        var newStudent = new CreateStudentDto
-        {
-            StudentId = studentId,
-            Name = "Delete",
-            Surname = "Test",
-            DateOfBirth = new DateTime(2005, 1, 1)
-        };
+        var newStudent = new CreateStudentDto(
+            StudentId: studentId,
+            Name: "Delete",
+            Surname: "Test",
+            DateOfBirth: new DateTime(2005, 1, 1),
+            City: null,
+            Street: null,
+            PostalCode: null
+        );
 
         await _client.PostAsJsonAsync("/api/v1/students", newStudent);
 

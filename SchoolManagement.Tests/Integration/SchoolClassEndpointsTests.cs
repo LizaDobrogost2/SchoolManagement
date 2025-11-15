@@ -34,11 +34,11 @@ public class SchoolClassEndpointsTests : IClassFixture<WebApplicationFactory<Pro
     public async Task CreateClass_WithValidData_ShouldReturnCreated()
     {
         // Arrange
-        var newClass = new CreateSchoolClassDto
-        {
-            Name = $"TestClass{Guid.NewGuid():N}".Substring(0, 20),
-            LeadingTeacher = "Test Teacher"
-        };
+        var className = $"TestClass{Guid.NewGuid():N}".Substring(0, 20);
+        var newClass = new CreateSchoolClassDto(
+            Name: className,
+            LeadingTeacher: "Test Teacher"
+        );
 
         // Act
         var response = await _client.PostAsJsonAsync("/api/v1/classes", newClass);
@@ -55,11 +55,10 @@ public class SchoolClassEndpointsTests : IClassFixture<WebApplicationFactory<Pro
     public async Task CreateClass_WithMissingData_ShouldReturnBadRequest()
     {
         // Arrange
-        var invalidClass = new CreateSchoolClassDto
-        {
-            Name = "",
-            LeadingTeacher = "Teacher"
-        };
+        var invalidClass = new CreateSchoolClassDto(
+            Name: "",
+            LeadingTeacher: "Teacher"
+        );
 
         // Act
         var response = await _client.PostAsJsonAsync("/api/v1/classes", invalidClass);
@@ -72,11 +71,11 @@ public class SchoolClassEndpointsTests : IClassFixture<WebApplicationFactory<Pro
     public async Task GetClassById_WithValidId_ShouldReturnClass()
     {
         // Arrange
-        var newClass = new CreateSchoolClassDto
-        {
-            Name = $"GetTest{Guid.NewGuid():N}".Substring(0, 20),
-            LeadingTeacher = "Get Teacher"
-        };
+        var className = $"GetTest{Guid.NewGuid():N}".Substring(0, 20);
+        var newClass = new CreateSchoolClassDto(
+            Name: className,
+            LeadingTeacher: "Get Teacher"
+        );
 
         var createResponse = await _client.PostAsJsonAsync("/api/v1/classes", newClass);
         var createdClass = await createResponse.Content.ReadFromJsonAsync<SchoolClassDto>();
@@ -105,20 +104,19 @@ public class SchoolClassEndpointsTests : IClassFixture<WebApplicationFactory<Pro
     public async Task UpdateClass_WithValidData_ShouldReturnOk()
     {
         // Arrange
-        var newClass = new CreateSchoolClassDto
-        {
-            Name = $"UpdateTest{Guid.NewGuid():N}".Substring(0, 20),
-            LeadingTeacher = "Original Teacher"
-        };
+        var className = $"UpdateTest{Guid.NewGuid():N}".Substring(0, 20);
+        var newClass = new CreateSchoolClassDto(
+            Name: className,
+            LeadingTeacher: "Original Teacher"
+        );
 
         var createResponse = await _client.PostAsJsonAsync("/api/v1/classes", newClass);
         var createdClass = await createResponse.Content.ReadFromJsonAsync<SchoolClassDto>();
 
-        var updateDto = new UpdateSchoolClassDto
-        {
-            Name = "Updated Class Name",
-            LeadingTeacher = "Updated Teacher"
-        };
+        var updateDto = new UpdateSchoolClassDto(
+            Name: "Updated Class Name",
+            LeadingTeacher: "Updated Teacher"
+        );
 
         // Act
         var response = await _client.PutAsJsonAsync($"/api/v1/classes/{createdClass!.Id}", updateDto);
@@ -134,19 +132,19 @@ public class SchoolClassEndpointsTests : IClassFixture<WebApplicationFactory<Pro
     public async Task PatchClass_WithPartialData_ShouldReturnOk()
     {
         // Arrange
-        var newClass = new CreateSchoolClassDto
-        {
-            Name = $"PatchTest{Guid.NewGuid():N}".Substring(0, 20),
-            LeadingTeacher = "Original Teacher"
-        };
+        var className = $"PatchTest{Guid.NewGuid():N}".Substring(0, 20);
+        var newClass = new CreateSchoolClassDto(
+            Name: className,
+            LeadingTeacher: "Original Teacher"
+        );
 
         var createResponse = await _client.PostAsJsonAsync("/api/v1/classes", newClass);
         var createdClass = await createResponse.Content.ReadFromJsonAsync<SchoolClassDto>();
 
-        var patchDto = new PatchSchoolClassDto
-        {
-            LeadingTeacher = "Patched Teacher"
-        };
+        var patchDto = new PatchSchoolClassDto(
+            Name: null,
+            LeadingTeacher: "Patched Teacher"
+        );
 
         // Act
         var response = await _client.PatchAsJsonAsync($"/api/v1/classes/{createdClass!.Id}", patchDto);
@@ -161,11 +159,11 @@ public class SchoolClassEndpointsTests : IClassFixture<WebApplicationFactory<Pro
     public async Task DeleteClass_WithValidId_ShouldReturnOk()
     {
         // Arrange
-        var newClass = new CreateSchoolClassDto
-        {
-            Name = $"DeleteTest{Guid.NewGuid():N}".Substring(0, 20),
-            LeadingTeacher = "Delete Teacher"
-        };
+        var className = $"DeleteTest{Guid.NewGuid():N}".Substring(0, 20);
+        var newClass = new CreateSchoolClassDto(
+            Name: className,
+            LeadingTeacher: "Delete Teacher"
+        );
 
         var createResponse = await _client.PostAsJsonAsync("/api/v1/classes", newClass);
         var createdClass = await createResponse.Content.ReadFromJsonAsync<SchoolClassDto>();
@@ -186,29 +184,28 @@ public class SchoolClassEndpointsTests : IClassFixture<WebApplicationFactory<Pro
     {
         // Arrange
         // Create a class
-        var newClass = new CreateSchoolClassDto
-        {
-            Name = $"AssignTest{Guid.NewGuid():N}".Substring(0, 20),
-            LeadingTeacher = "Assignment Teacher"
-        };
+        var className = $"AssignTest{Guid.NewGuid():N}".Substring(0, 20);
+        var newClass = new CreateSchoolClassDto(
+            Name: className,
+            LeadingTeacher: "Assignment Teacher"
+        );
         var classResponse = await _client.PostAsJsonAsync("/api/v1/classes", newClass);
         var createdClass = await classResponse.Content.ReadFromJsonAsync<SchoolClassDto>();
 
         // Create a student
         var studentId = $"ASN{Guid.NewGuid():N}".Substring(0, 10);
-        var newStudent = new CreateStudentDto
-        {
-            StudentId = studentId,
-            Name = "Assign",
-            Surname = "Test",
-            DateOfBirth = new DateTime(2005, 1, 1)
-        };
+        var newStudent = new CreateStudentDto(
+            StudentId: studentId,
+            Name: "Assign",
+            Surname: "Test",
+            DateOfBirth: new DateTime(2005, 1, 1),
+            City: null,
+            Street: null,
+            PostalCode: null
+        );
         await _client.PostAsJsonAsync("/api/v1/students", newStudent);
 
-        var assignDto = new AddStudentToClassDto
-        {
-            StudentId = studentId
-        };
+        var assignDto = new AddStudentToClassDto(StudentId: studentId);
 
         // Act
         var response = await _client.PostAsJsonAsync($"/api/v1/classes/{createdClass!.Id}/students", assignDto);
@@ -222,26 +219,28 @@ public class SchoolClassEndpointsTests : IClassFixture<WebApplicationFactory<Pro
     {
         // Arrange
         // Create a class
-        var newClass = new CreateSchoolClassDto
-        {
-            Name = $"RemoveTest{Guid.NewGuid():N}".Substring(0, 20),
-            LeadingTeacher = "Remove Teacher"
-        };
+        var className = $"RemoveTest{Guid.NewGuid():N}".Substring(0, 20);
+        var newClass = new CreateSchoolClassDto(
+            Name: className,
+            LeadingTeacher: "Remove Teacher"
+        );
         var classResponse = await _client.PostAsJsonAsync("/api/v1/classes", newClass);
         var createdClass = await classResponse.Content.ReadFromJsonAsync<SchoolClassDto>();
 
         // Create and assign a student
         var studentId = $"REM{Guid.NewGuid():N}".Substring(0, 10);
-        var newStudent = new CreateStudentDto
-        {
-            StudentId = studentId,
-            Name = "Remove",
-            Surname = "Test",
-            DateOfBirth = new DateTime(2005, 1, 1)
-        };
+        var newStudent = new CreateStudentDto(
+            StudentId: studentId,
+            Name: "Remove",
+            Surname: "Test",
+            DateOfBirth: new DateTime(2005, 1, 1),
+            City: null,
+            Street: null,
+            PostalCode: null
+        );
         await _client.PostAsJsonAsync("/api/v1/students", newStudent);
 
-        var assignDto = new AddStudentToClassDto { StudentId = studentId };
+        var assignDto = new AddStudentToClassDto(StudentId: studentId);
         await _client.PostAsJsonAsync($"/api/v1/classes/{createdClass!.Id}/students", assignDto);
 
         // Act

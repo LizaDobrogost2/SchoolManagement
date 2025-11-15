@@ -32,6 +32,11 @@ Then open your browser to:
 
 See **[QUICKSTART.md](QUICKSTART.md)** for detailed testing examples.
 
+## Testing
+
+```bash
+dotnet test
+```
 ## API Endpoints (v1)
 
 All endpoints are versioned. Current version: **v1.0**

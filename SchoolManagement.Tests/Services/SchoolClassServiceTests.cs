@@ -95,7 +95,7 @@ public class SchoolClassServiceTests
 
         // Assert
         result.Should().NotBeNull();
-        result.Status.Should().Be(ServiceResultStatus.Success);
+        result.Status.Should().Be(ServiceResultStatus.Ok);
         result.Data.Should().NotBeNull();
         result.Data!.Name.Should().Be("Class 5A");
         result.Data.Students.Should().HaveCount(1);
@@ -114,7 +114,7 @@ public class SchoolClassServiceTests
         // Assert
         result.Should().NotBeNull();
         result.Status.Should().Be(ServiceResultStatus.NotFound);
-        result.Message.Should().Contain("not found");
+        result.ErrorMessage.Should().Contain("not found");
     }
 
     #endregion
@@ -125,14 +125,13 @@ public class SchoolClassServiceTests
     public async Task CreateClassAsync_WithValidData_ShouldCreateClass()
     {
         // Arrange
-        var dto = new CreateSchoolClassDto
-        {
-            Name = "Class 5A",
-            LeadingTeacher = "Mrs. Smith"
-        };
+        var dto = new CreateSchoolClassDto(
+            Name: "Class 5A",
+            LeadingTeacher: "Mrs. Smith"
+        );
 
         _mockClassRepository.Setup(r => r.AddAsync(It.IsAny<SchoolClass>()))
-            .Returns(Task.CompletedTask);
+            .ReturnsAsync((SchoolClass c) => c);
 
         // Act
         var result = await _sut.CreateClassAsync(dto);
@@ -150,11 +149,10 @@ public class SchoolClassServiceTests
     public async Task CreateClassAsync_WithMissingName_ShouldReturnBadRequest()
     {
         // Arrange
-        var dto = new CreateSchoolClassDto
-        {
-            Name = "",
-            LeadingTeacher = "Mrs. Smith"
-        };
+        var dto = new CreateSchoolClassDto(
+            Name: "",
+            LeadingTeacher: "Mrs. Smith"
+        );
 
         // Act
         var result = await _sut.CreateClassAsync(dto);
@@ -169,11 +167,10 @@ public class SchoolClassServiceTests
     public async Task CreateClassAsync_WithMissingTeacher_ShouldReturnBadRequest()
     {
         // Arrange
-        var dto = new CreateSchoolClassDto
-        {
-            Name = "Class 5A",
-            LeadingTeacher = ""
-        };
+        var dto = new CreateSchoolClassDto(
+            Name: "Class 5A",
+            LeadingTeacher: ""
+        );
 
         // Act
         var result = await _sut.CreateClassAsync(dto);
@@ -199,11 +196,10 @@ public class SchoolClassServiceTests
             Students = new List<Student>()
         };
 
-        var dto = new UpdateSchoolClassDto
-        {
-            Name = "Class 5A Advanced",
-            LeadingTeacher = "Mrs. Smith-Brown"
-        };
+        var dto = new UpdateSchoolClassDto(
+            Name: "Class 5A Advanced",
+            LeadingTeacher: "Mrs. Smith-Brown"
+        );
 
         _mockClassRepository.Setup(r => r.GetByIdAsync(1))
             .ReturnsAsync(existingClass);
@@ -219,7 +215,7 @@ public class SchoolClassServiceTests
 
         // Assert
         result.Should().NotBeNull();
-        result.Status.Should().Be(ServiceResultStatus.Success);
+        result.Status.Should().Be(ServiceResultStatus.Ok);
         result.Data!.Name.Should().Be("Class 5A Advanced");
         result.Data.LeadingTeacher.Should().Be("Mrs. Smith-Brown");
         _mockClassRepository.Verify(r => r.UpdateAsync(It.IsAny<SchoolClass>()), Times.Once);
@@ -229,11 +225,10 @@ public class SchoolClassServiceTests
     public async Task UpdateClassAsync_WithInvalidId_ShouldReturnNotFound()
     {
         // Arrange
-        var dto = new UpdateSchoolClassDto
-        {
-            Name = "Class 5A",
-            LeadingTeacher = "Mrs. Smith"
-        };
+        var dto = new UpdateSchoolClassDto(
+            Name: "Class 5A",
+            LeadingTeacher: "Mrs. Smith"
+        );
 
         _mockClassRepository.Setup(r => r.GetByIdAsync(999))
             .ReturnsAsync((SchoolClass?)null);
@@ -274,7 +269,7 @@ public class SchoolClassServiceTests
 
         // Assert
         result.Should().NotBeNull();
-        result.Status.Should().Be(ServiceResultStatus.Success);
+        result.Status.Should().Be(ServiceResultStatus.Ok);
         _mockClassRepository.Verify(r => r.DeleteAsync(It.IsAny<SchoolClass>()), Times.Once);
     }
 
@@ -307,7 +302,7 @@ public class SchoolClassServiceTests
 
         // Assert
         result.Should().NotBeNull();
-        result.Status.Should().Be(ServiceResultStatus.Success);
+        result.Status.Should().Be(ServiceResultStatus.Ok);
         students.All(s => s.SchoolClassId == null).Should().BeTrue();
         _mockClassRepository.Verify(r => r.DeleteAsync(It.IsAny<SchoolClass>()), Times.Once);
     }
@@ -350,7 +345,7 @@ public class SchoolClassServiceTests
 
         // Assert
         result.Should().NotBeNull();
-        result.Status.Should().Be(ServiceResultStatus.Success);
+        result.Status.Should().Be(ServiceResultStatus.Ok);
         _mockStudentRepository.Verify(r => r.UpdateAsync(It.Is<Student>(s => s.SchoolClassId == 1)), Times.Once);
     }
 
@@ -377,7 +372,7 @@ public class SchoolClassServiceTests
         // Assert
         result.Should().NotBeNull();
         result.Status.Should().Be(ServiceResultStatus.BadRequest);
-        result.Message.Should().Contain("full");
+        result.ErrorMessage.Should().Contain("maximum");
     }
 
     [Fact]
@@ -413,7 +408,7 @@ public class SchoolClassServiceTests
         // Assert
         result.Should().NotBeNull();
         result.Status.Should().Be(ServiceResultStatus.BadRequest);
-        result.Message.Should().Contain("already");
+        result.ErrorMessage.Should().Contain("already");
     }
 
     #endregion
@@ -454,7 +449,7 @@ public class SchoolClassServiceTests
 
         // Assert
         result.Should().NotBeNull();
-        result.Status.Should().Be(ServiceResultStatus.Success);
+        result.Status.Should().Be(ServiceResultStatus.Ok);
         _mockStudentRepository.Verify(r => r.UpdateAsync(It.Is<Student>(s => s.SchoolClassId == null)), Times.Once);
     }
 
@@ -490,7 +485,7 @@ public class SchoolClassServiceTests
         // Assert
         result.Should().NotBeNull();
         result.Status.Should().Be(ServiceResultStatus.BadRequest);
-        result.Message.Should().Contain("not in");
+        result.ErrorMessage.Should().Contain("not in");
     }
 
     #endregion

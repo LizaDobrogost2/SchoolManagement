@@ -93,7 +93,7 @@ public class StudentServiceTests
 
         // Assert
         result.Should().NotBeNull();
-        result.IsSuccess.Should().BeTrue();
+        result.Status.Should().Be(ServiceResultStatus.Ok);
         result.Data.Should().NotBeNull();
         result.Data!.StudentId.Should().Be("S001");
         result.Data.Name.Should().Be("John");
@@ -111,7 +111,7 @@ public class StudentServiceTests
 
         // Assert
         result.Should().NotBeNull();
-        result.IsSuccess.Should().BeFalse();
+        result.Status.Should().Be(ServiceResultStatus.NotFound);
         result.ErrorMessage.Should().Contain("not found");
     }
 
@@ -123,27 +123,28 @@ public class StudentServiceTests
     public async Task CreateStudentAsync_WithValidData_ShouldCreateStudent()
     {
         // Arrange
-        var dto = new CreateStudentDto
-        {
-            StudentId = "S001",
-            Name = "John",
-            Surname = "Doe",
-            DateOfBirth = new DateTime(2005, 1, 1),
-            City = "New York"
-        };
+        var dto = new CreateStudentDto(
+            StudentId: "S001",
+            Name: "John",
+            Surname: "Doe",
+            DateOfBirth: new DateTime(2005, 1, 1),
+            City: "New York",
+            Street: null,
+            PostalCode: null
+        );
 
         _mockStudentRepository.Setup(r => r.ExistsAsync("S001"))
             .ReturnsAsync(false);
         
         _mockStudentRepository.Setup(r => r.AddAsync(It.IsAny<Student>()))
-            .Returns(Task.CompletedTask);
+            .ReturnsAsync((Student s) => s);
 
         // Act
         var result = await _sut.CreateStudentAsync(dto);
 
         // Assert
         result.Should().NotBeNull();
-        result.IsSuccess.Should().BeTrue();
+        result.Status.Should().Be(ServiceResultStatus.Created);
         result.Data.Should().NotBeNull();
         result.Data!.StudentId.Should().Be("S001");
         result.Data.Name.Should().Be("John");
@@ -154,13 +155,15 @@ public class StudentServiceTests
     public async Task CreateStudentAsync_WithDuplicateId_ShouldReturnConflict()
     {
         // Arrange
-        var dto = new CreateStudentDto
-        {
-            StudentId = "S001",
-            Name = "John",
-            Surname = "Doe",
-            DateOfBirth = new DateTime(2005, 1, 1)
-        };
+        var dto = new CreateStudentDto(
+            StudentId: "S001",
+            Name: "John",
+            Surname: "Doe",
+            DateOfBirth: new DateTime(2005, 1, 1),
+            City: null,
+            Street: null,
+            PostalCode: null
+        );
 
         _mockStudentRepository.Setup(r => r.ExistsAsync("S001"))
             .ReturnsAsync(true);
@@ -170,7 +173,7 @@ public class StudentServiceTests
 
         // Assert
         result.Should().NotBeNull();
-        result.IsSuccess.Should().BeFalse();
+        result.Status.Should().Be(ServiceResultStatus.Conflict);
         result.ErrorMessage.Should().Contain("already exists");
         _mockStudentRepository.Verify(r => r.AddAsync(It.IsAny<Student>()), Times.Never);
     }
@@ -179,40 +182,44 @@ public class StudentServiceTests
     public async Task CreateStudentAsync_WithMissingStudentId_ShouldReturnBadRequest()
     {
         // Arrange
-        var dto = new CreateStudentDto
-        {
-            StudentId = "",
-            Name = "John",
-            Surname = "Doe",
-            DateOfBirth = new DateTime(2005, 1, 1)
-        };
+        var dto = new CreateStudentDto(
+            StudentId: "",
+            Name: "John",
+            Surname: "Doe",
+            DateOfBirth: new DateTime(2005, 1, 1),
+            City: null,
+            Street: null,
+            PostalCode: null
+        );
 
         // Act
         var result = await _sut.CreateStudentAsync(dto);
 
         // Assert
         result.Should().NotBeNull();
-        result.IsSuccess.Should().BeFalse();
+        result.Status.Should().Be(ServiceResultStatus.BadRequest);
     }
 
     [Fact]
     public async Task CreateStudentAsync_WithMissingName_ShouldReturnBadRequest()
     {
         // Arrange
-        var dto = new CreateStudentDto
-        {
-            StudentId = "S001",
-            Name = "",
-            Surname = "Doe",
-            DateOfBirth = new DateTime(2005, 1, 1)
-        };
+        var dto = new CreateStudentDto(
+            StudentId: "S001",
+            Name: "",
+            Surname: "Doe",
+            DateOfBirth: new DateTime(2005, 1, 1),
+            City: null,
+            Street: null,
+            PostalCode: null
+        );
 
         // Act
         var result = await _sut.CreateStudentAsync(dto);
 
         // Assert
         result.Should().NotBeNull();
-        result.IsSuccess.Should().BeFalse();
+        result.Status.Should().Be(ServiceResultStatus.BadRequest);
     }
 
     #endregion
@@ -251,7 +258,7 @@ public class StudentServiceTests
 
         // Assert
         result.Should().NotBeNull();
-        result.IsSuccess.Should().BeTrue();
+        result.Status.Should().Be(ServiceResultStatus.Ok);
         result.Data!.Name.Should().Be("John Updated");
         _mockStudentRepository.Verify(r => r.UpdateAsync(It.IsAny<Student>()), Times.Once);
     }
@@ -277,7 +284,7 @@ public class StudentServiceTests
 
         // Assert
         result.Should().NotBeNull();
-        result.IsSuccess.Should().BeFalse();
+        result.Status.Should().Be(ServiceResultStatus.NotFound);
         _mockStudentRepository.Verify(r => r.UpdateAsync(It.IsAny<Student>()), Times.Never);
     }
 
@@ -319,7 +326,7 @@ public class StudentServiceTests
 
         // Assert
         result.Should().NotBeNull();
-        result.IsSuccess.Should().BeTrue();
+        result.Status.Should().Be(ServiceResultStatus.Ok);
         result.Data!.Name.Should().Be("John"); // Unchanged
         result.Data.City.Should().Be("Los Angeles"); // Changed
     }
@@ -368,7 +375,7 @@ public class StudentServiceTests
 
         // Assert
         result.Should().NotBeNull();
-        result.IsSuccess.Should().BeTrue();
+        result.Status.Should().Be(ServiceResultStatus.Ok);
         _mockStudentRepository.Verify(r => r.UpdateAsync(It.Is<Student>(s => s.SchoolClassId == 1)), Times.Once);
     }
 
@@ -415,8 +422,8 @@ public class StudentServiceTests
 
         // Assert
         result.Should().NotBeNull();
-        result.IsSuccess.Should().BeFalse();
-        result.ErrorMessage.Should().Contain("full");
+        result.Status.Should().Be(ServiceResultStatus.BadRequest);
+        result.ErrorMessage.Should().Contain("maximum");
     }
 
     #endregion
@@ -446,7 +453,7 @@ public class StudentServiceTests
 
         // Assert
         result.Should().NotBeNull();
-        result.IsSuccess.Should().BeTrue();
+        result.Status.Should().Be(ServiceResultStatus.Ok);
         _mockStudentRepository.Verify(r => r.DeleteAsync(It.IsAny<Student>()), Times.Once);
     }
 
@@ -462,7 +469,7 @@ public class StudentServiceTests
 
         // Assert
         result.Should().NotBeNull();
-        result.IsSuccess.Should().BeFalse();
+        result.Status.Should().Be(ServiceResultStatus.NotFound);
         _mockStudentRepository.Verify(r => r.DeleteAsync(It.IsAny<Student>()), Times.Never);
     }
 
