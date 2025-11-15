@@ -56,8 +56,6 @@ All endpoints are versioned. Current version: **v1.0**
 - `PUT /api/v1/classes/{id}` - Update (full)
 - `PATCH /api/v1/classes/{id}` - Update (partial)
 - `DELETE /api/v1/classes/{id}` - Delete
-- ~~`POST /api/v1/classes/{classId}/students`~~ - **Deprecated** (use PATCH student instead)
-- ~~`DELETE /api/v1/classes/{classId}/students/{studentId}`~~ - **Deprecated** (use PATCH student instead)
 
 ### Assigning Students to Classes
 
