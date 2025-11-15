@@ -2,7 +2,6 @@ using SchoolManagement.Common;
 using SchoolManagement.Extensions;
 using SchoolManagement.Models;
 using SchoolManagement.Repositories;
-using Microsoft.Extensions.Logging;
 
 namespace SchoolManagement.Services;
 
@@ -23,7 +22,7 @@ public class StudentService : IStudentService
     /// <param name="classRepository">Repository for class data access (needed for class assignment validation).</param>
     /// <param name="logger">Logger for structured logging.</param>
     public StudentService(
-        IStudentRepository studentRepository, 
+        IStudentRepository studentRepository,
         ISchoolClassRepository classRepository,
         ILogger<StudentService> logger)
     {
@@ -46,7 +45,7 @@ public class StudentService : IStudentService
     {
         _logger.LogInformation("Retrieving student with ID: {StudentId}", studentId);
         var student = await _studentRepository.GetByIdAsync(studentId);
-        
+
         if (student == null)
         {
             _logger.LogWarning("Student not found: {StudentId}", studentId);
@@ -62,10 +61,10 @@ public class StudentService : IStudentService
     public async Task<ServiceResult<StudentDto>> CreateStudentAsync(CreateStudentDto dto)
     {
         _logger.LogInformation("Creating new student with ID: {StudentId}", dto.StudentId);
-        
+
         // Validate required fields
-        if (string.IsNullOrWhiteSpace(dto.StudentId) || 
-            string.IsNullOrWhiteSpace(dto.Name) || 
+        if (string.IsNullOrWhiteSpace(dto.StudentId) ||
+            string.IsNullOrWhiteSpace(dto.Name) ||
             string.IsNullOrWhiteSpace(dto.Surname))
         {
             _logger.LogWarning("Student creation failed: missing required fields for {StudentId}", dto.StudentId);
@@ -84,7 +83,7 @@ public class StudentService : IStudentService
         var student = dto.ToEntity();
         await _studentRepository.AddAsync(student);
 
-        _logger.LogInformation("Successfully created student: {StudentId} - {Name} {Surname}", 
+        _logger.LogInformation("Successfully created student: {StudentId} - {Name} {Surname}",
             student.StudentId, student.Name, student.Surname);
         return ServiceResult<StudentDto>.Created(student.ToDto());
     }
@@ -94,7 +93,7 @@ public class StudentService : IStudentService
     {
         _logger.LogInformation("Updating student: {StudentId}", studentId);
         var student = await _studentRepository.GetByIdAsync(studentId);
-        
+
         if (student == null)
         {
             _logger.LogWarning("Update failed: Student not found {StudentId}", studentId);
@@ -122,7 +121,7 @@ public class StudentService : IStudentService
     {
         _logger.LogInformation("Partially updating student: {StudentId}", studentId);
         var student = await _studentRepository.GetByIdAsync(studentId);
-        
+
         if (student == null)
         {
             _logger.LogWarning("Patch failed: Student not found {StudentId}", studentId);
@@ -171,12 +170,10 @@ public class StudentService : IStudentService
             student.PostalCode = dto.PostalCode;
         }
 
-        // Handle class assignment with validation
         if (dto.SchoolClassId.HasValue)
         {
             var classId = dto.SchoolClassId.Value;
-            
-            // Allow null to unassign from class
+
             if (classId == 0)
             {
                 _logger.LogInformation("Unassigning student {StudentId} from class", studentId);
@@ -184,7 +181,6 @@ public class StudentService : IStudentService
             }
             else if (classId > 0)
             {
-                // Validate class exists
                 var schoolClass = await _classRepository.GetByIdWithStudentsAsync(classId);
                 if (schoolClass == null)
                 {
@@ -193,7 +189,6 @@ public class StudentService : IStudentService
                         string.Format(ValidationMessages.ClassNotFound, classId));
                 }
 
-                // Check if student is already in this class
                 if (student.SchoolClassId == classId)
                 {
                     _logger.LogWarning("Patch failed: Student {StudentId} already in class {ClassId}", studentId, classId);
@@ -201,10 +196,9 @@ public class StudentService : IStudentService
                         string.Format(ValidationMessages.StudentAlreadyInClass, student.Name, student.Surname));
                 }
 
-                // Check class capacity (only if adding to a different class)
                 if (student.SchoolClassId != classId && schoolClass.Students?.Count >= BusinessConstants.MaxStudentsPerClass)
                 {
-                    _logger.LogWarning("Patch failed: Class {ClassId} is full (max: {MaxStudents})", 
+                    _logger.LogWarning("Patch failed: Class {ClassId} is full (max: {MaxStudents})",
                         classId, BusinessConstants.MaxStudentsPerClass);
                     return ServiceResult<StudentDto>.BadRequest(
                         string.Format(ValidationMessages.ClassFull, schoolClass.Name, BusinessConstants.MaxStudentsPerClass));
@@ -230,7 +224,7 @@ public class StudentService : IStudentService
     {
         _logger.LogInformation("Deleting student: {StudentId}", studentId);
         var student = await _studentRepository.GetByIdAsync(studentId);
-        
+
         if (student == null)
         {
             _logger.LogWarning("Delete failed: Student not found {StudentId}", studentId);

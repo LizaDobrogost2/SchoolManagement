@@ -45,11 +45,6 @@ public interface IStudentService
     /// <param name="studentId">The unique identifier of the student to update.</param>
     /// <param name="dto">The partial update data (all fields optional).</param>
     /// <returns>A service result containing the updated student DTO or error information.</returns>
-    /// <remarks>
-    /// Use this method to assign/unassign students to/from classes:
-    /// - Set SchoolClassId to a class ID to assign
-    /// - Set SchoolClassId to null or 0 to unassign
-    /// </remarks>
     Task<ServiceResult<StudentDto>> PatchStudentAsync(string studentId, PatchStudentDto dto);
 
     /// <summary>

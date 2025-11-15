@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using SchoolManagement.Data.Configurations;
 using SchoolManagement.Models;
 
 namespace SchoolManagement.Data;
@@ -34,13 +33,7 @@ public class SchoolDbContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
 
-        // Apply all configurations from the current assembly
-        // This automatically finds and applies all IEntityTypeConfiguration implementations
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(SchoolDbContext).Assembly);
-
-        // Alternative explicit approach (if you prefer explicit over convention):
-        // modelBuilder.ApplyConfiguration(new StudentConfiguration());
-        // modelBuilder.ApplyConfiguration(new SchoolClassConfiguration());
     }
 }
 

@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
-using Microsoft.Extensions.Diagnostics.HealthChecks;
 using System.Text.Json;
 
 namespace SchoolManagement.Endpoints;
@@ -12,7 +11,6 @@ public static class HealthEndpoints
 {
     public static void MapHealthEndpoints(this IEndpointRouteBuilder app)
     {
-        // Simple health check endpoint
         app.MapHealthChecks("/health", new HealthCheckOptions
         {
             ResponseWriter = async (context, report) =>
@@ -40,13 +38,11 @@ public static class HealthEndpoints
             }
         }).AllowAnonymous();
 
-        // Liveness probe - checks if the application is running
         app.MapHealthChecks("/health/live", new HealthCheckOptions
         {
-            Predicate = _ => false // Don't run any checks, just return healthy if app is running
+            Predicate = _ => false
         }).AllowAnonymous();
 
-        // Readiness probe - checks if the application is ready to accept traffic
         app.MapHealthChecks("/health/ready", new HealthCheckOptions
         {
             Predicate = check => check.Tags.Contains("ready")

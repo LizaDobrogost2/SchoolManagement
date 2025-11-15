@@ -13,22 +13,18 @@ namespace SchoolManagement.Services;
 public class SchoolClassService : ISchoolClassService
 {
     private readonly ISchoolClassRepository _classRepository;
-    private readonly IStudentRepository _studentRepository;
     private readonly ILogger<SchoolClassService> _logger;
 
     /// <summary>
     /// Initializes a new instance of the SchoolClassService.
     /// </summary>
     /// <param name="classRepository">Repository for class data access.</param>
-    /// <param name="studentRepository">Repository for student data access (needed for student assignment operations).</param>
     /// <param name="logger">Logger for structured logging.</param>
     public SchoolClassService(
         ISchoolClassRepository classRepository,
-        IStudentRepository studentRepository,
         ILogger<SchoolClassService> logger)
     {
         _classRepository = classRepository;
-        _studentRepository = studentRepository;
         _logger = logger;
     }
 
@@ -176,87 +172,5 @@ public class SchoolClassService : ISchoolClassService
         _logger.LogInformation("Successfully deleted class: {ClassId}", id);
         return ServiceResult<string>.Success(
             string.Format(ValidationMessages.ClassDeleted, id));
-    }
-
-    public async Task<ServiceResult<string>> AddStudentToClassAsync(int classId, string studentId)
-    {
-        _logger.LogInformation("Adding student {StudentId} to class {ClassId}", studentId, classId);
-        var schoolClass = await _classRepository.GetByIdWithStudentsAsync(classId);
-        
-        if (schoolClass == null)
-        {
-            _logger.LogWarning("Add student failed: Class not found {ClassId}", classId);
-            return ServiceResult<string>.NotFound(
-                string.Format(ValidationMessages.ClassNotFound, classId));
-        }
-
-        // Check if class is full
-        if (schoolClass.Students?.Count >= BusinessConstants.MaxStudentsPerClass)
-        {
-            _logger.LogWarning("Add student failed: Class {ClassId} is full (max: {MaxStudents})", 
-                classId, BusinessConstants.MaxStudentsPerClass);
-            return ServiceResult<string>.BadRequest(
-                string.Format(ValidationMessages.ClassFull, schoolClass.Name, BusinessConstants.MaxStudentsPerClass));
-        }
-
-        var student = await _studentRepository.GetByIdAsync(studentId);
-        
-        if (student == null)
-        {
-            _logger.LogWarning("Add student failed: Student not found {StudentId}", studentId);
-            return ServiceResult<string>.NotFound(
-                string.Format(ValidationMessages.StudentNotFound, studentId));
-        }
-
-        // Check if student is already in this class
-        if (student.SchoolClassId == classId)
-        {
-            _logger.LogWarning("Add student failed: Student {StudentId} already in class {ClassId}", studentId, classId);
-            return ServiceResult<string>.BadRequest(
-                string.Format(ValidationMessages.StudentAlreadyInClass, student.Name, student.Surname));
-        }
-
-        student.SchoolClassId = classId;
-        await _studentRepository.UpdateAsync(student);
-
-        _logger.LogInformation("Successfully added student {StudentId} to class {ClassId}", studentId, classId);
-        return ServiceResult<string>.Success(
-            string.Format(ValidationMessages.StudentAddedToClass, student.Name, student.Surname, schoolClass.Name));
-    }
-
-    public async Task<ServiceResult<string>> RemoveStudentFromClassAsync(int classId, string studentId)
-    {
-        _logger.LogInformation("Removing student {StudentId} from class {ClassId}", studentId, classId);
-        var schoolClass = await _classRepository.GetByIdAsync(classId);
-        
-        if (schoolClass == null)
-        {
-            _logger.LogWarning("Remove student failed: Class not found {ClassId}", classId);
-            return ServiceResult<string>.NotFound(
-                string.Format(ValidationMessages.ClassNotFound, classId));
-        }
-
-        var student = await _studentRepository.GetByIdAsync(studentId);
-        
-        if (student == null)
-        {
-            _logger.LogWarning("Remove student failed: Student not found {StudentId}", studentId);
-            return ServiceResult<string>.NotFound(
-                string.Format(ValidationMessages.StudentNotFound, studentId));
-        }
-
-        if (student.SchoolClassId != classId)
-        {
-            _logger.LogWarning("Remove student failed: Student {StudentId} not in class {ClassId}", studentId, classId);
-            return ServiceResult<string>.BadRequest(
-                string.Format(ValidationMessages.StudentNotInClass, student.Name, student.Surname));
-        }
-
-        student.SchoolClassId = null;
-        await _studentRepository.UpdateAsync(student);
-
-        _logger.LogInformation("Successfully removed student {StudentId} from class {ClassId}", studentId, classId);
-        return ServiceResult<string>.Success(
-            string.Format(ValidationMessages.StudentRemovedFromClass, student.Name, student.Surname, schoolClass.Name));
     }
 }

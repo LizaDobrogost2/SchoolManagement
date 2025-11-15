@@ -4,7 +4,6 @@ namespace SchoolManagement.Repositories;
 
 /// <summary>
 /// Repository interface for SchoolClass entity data access operations.
-/// Defines the contract for school class-related database operations.
 /// </summary>
 public interface ISchoolClassRepository
 {
@@ -16,7 +15,6 @@ public interface ISchoolClassRepository
 
     /// <summary>
     /// Retrieves a school class by its ID (without students).
-    /// Use this when you don't need the student list for better performance.
     /// </summary>
     /// <param name="id">The unique identifier of the class.</param>
     /// <returns>The school class if found, otherwise null.</returns>
@@ -24,7 +22,6 @@ public interface ISchoolClassRepository
 
     /// <summary>
     /// Retrieves a school class by its ID, including all assigned students.
-    /// Use this when you need the complete class information with student list.
     /// </summary>
     /// <param name="id">The unique identifier of the class.</param>
     /// <returns>The school class with students if found, otherwise null.</returns>
@@ -45,7 +42,6 @@ public interface ISchoolClassRepository
 
     /// <summary>
     /// Removes a school class from the database.
-    /// Note: Students in this class will have their SchoolClassId set to null.
     /// </summary>
     /// <param name="schoolClass">The school class entity to remove.</param>
     Task DeleteAsync(SchoolClass schoolClass);

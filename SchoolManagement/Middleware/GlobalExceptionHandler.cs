@@ -52,13 +52,10 @@ public class GlobalExceptionHandler : IExceptionHandler
             Type = GetTypeUrl(statusCode)
         };
 
-        // Add trace ID for correlation
         problemDetails.Extensions["traceId"] = context.TraceIdentifier;
 
-        // Add timestamp
         problemDetails.Extensions["timestamp"] = DateTime.UtcNow;
 
-        // In development, include exception details for debugging
         if (_environment.IsDevelopment())
         {
             problemDetails.Extensions["exceptionType"] = exception.GetType().Name;
@@ -119,7 +116,6 @@ public class GlobalExceptionHandler : IExceptionHandler
 
     private string GetDetail(Exception exception)
     {
-        // In production, return generic message for security
         if (!_environment.IsDevelopment())
         {
             return exception switch
@@ -133,7 +129,6 @@ public class GlobalExceptionHandler : IExceptionHandler
             };
         }
 
-        // In development, return actual exception message
         return exception.Message;
     }
 

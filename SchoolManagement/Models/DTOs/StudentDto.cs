@@ -2,7 +2,6 @@ namespace SchoolManagement.Models;
 
 /// <summary>
 /// Data Transfer Object for returning student information from the API.
-/// Includes all student data plus class assignment information.
 /// </summary>
 /// <param name="StudentId">Unique identifier for the student.</param>
 /// <param name="Name">Student's first name.</param>

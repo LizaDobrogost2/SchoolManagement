@@ -54,30 +54,4 @@ public interface ISchoolClassService
     /// <param name="id">The unique identifier of the class to delete.</param>
     /// <returns>A service result containing a success message or error information.</returns>
     Task<ServiceResult<string>> DeleteClassAsync(int id);
-
-    /// <summary>
-    /// Adds a student to a school class (legacy endpoint).
-    /// Validates class capacity (max 20 students) and student existence.
-    /// </summary>
-    /// <param name="classId">The ID of the class.</param>
-    /// <param name="studentId">The ID of the student to add.</param>
-    /// <returns>A service result containing a success message or error information.</returns>
-    /// <remarks>
-    /// ?? DEPRECATED: For new development, use PatchStudentAsync in IStudentService instead.
-    /// This method is kept for backward compatibility.
-    /// </remarks>
-    Task<ServiceResult<string>> AddStudentToClassAsync(int classId, string studentId);
-
-    /// <summary>
-    /// Removes a student from a school class (legacy endpoint).
-    /// Sets the student's SchoolClassId to null.
-    /// </summary>
-    /// <param name="classId">The ID of the class.</param>
-    /// <param name="studentId">The ID of the student to remove.</param>
-    /// <returns>A service result containing a success message or error information.</returns>
-    /// <remarks>
-    /// ?? DEPRECATED: For new development, use PatchStudentAsync in IStudentService instead.
-    /// This method is kept for backward compatibility.
-    /// </remarks>
-    Task<ServiceResult<string>> RemoveStudentFromClassAsync(int classId, string studentId);
 }

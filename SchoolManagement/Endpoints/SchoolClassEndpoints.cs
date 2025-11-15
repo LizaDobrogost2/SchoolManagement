@@ -1,7 +1,5 @@
 using SchoolManagement.Models;
 using SchoolManagement.Services;
-using Asp.Versioning;
-using Asp.Versioning.Builder;
 
 namespace SchoolManagement.Endpoints;
 
@@ -51,23 +49,6 @@ public static class SchoolClassEndpoints
             .Produces(StatusCodes.Status404NotFound)
             .MapToApiVersion(1.0);
 
-        // Keep these for backward compatibility, but document as deprecated
-        group.MapPost("/{classId}/students", AddStudentToClass)
-            .WithName("AddStudentToClass")
-            .WithDescription("?? Deprecated: Use PATCH /api/v1/students/{id} with {\"schoolClassId\": classId} instead")
-            .Produces<object>()
-            .Produces(StatusCodes.Status400BadRequest)
-            .Produces(StatusCodes.Status404NotFound)
-            .MapToApiVersion(1.0);
-
-        group.MapDelete("/{classId}/students/{studentId}", RemoveStudentFromClass)
-            .WithName("RemoveStudentFromClass")
-            .WithDescription("?? Deprecated: Use PATCH /api/v1/students/{id} with {\"schoolClassId\": null} instead")
-            .Produces<object>()
-            .Produces(StatusCodes.Status400BadRequest)
-            .Produces(StatusCodes.Status404NotFound)
-            .MapToApiVersion(1.0);
-
         return group;
     }
 
@@ -106,24 +87,6 @@ public static class SchoolClassEndpoints
     private static async Task<IResult> DeleteClass(int id, ISchoolClassService classService)
     {
         var result = await classService.DeleteClassAsync(id);
-        return result.ToHttpResult(data => new { message = data });
-    }
-
-    private static async Task<IResult> AddStudentToClass(
-        int classId, 
-        AddStudentToClassDto dto, 
-        ISchoolClassService classService)
-    {
-        var result = await classService.AddStudentToClassAsync(classId, dto.StudentId);
-        return result.ToHttpResult(data => new { message = data });
-    }
-
-    private static async Task<IResult> RemoveStudentFromClass(
-        int classId, 
-        string studentId, 
-        ISchoolClassService classService)
-    {
-        var result = await classService.RemoveStudentFromClassAsync(classId, studentId);
         return result.ToHttpResult(data => new { message = data });
     }
 }

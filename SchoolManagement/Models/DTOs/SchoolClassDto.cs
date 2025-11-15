@@ -2,7 +2,6 @@ namespace SchoolManagement.Models;
 
 /// <summary>
 /// Data Transfer Object for returning school class information from the API.
-/// Includes class details, student count, and the list of students in the class.
 /// </summary>
 /// <param name="Id">Unique identifier for the class (auto-generated).</param>
 /// <param name="Name">Name of the class.</param>

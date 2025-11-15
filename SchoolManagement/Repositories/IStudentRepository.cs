@@ -4,7 +4,6 @@ namespace SchoolManagement.Repositories;
 
 /// <summary>
 /// Repository interface for Student entity data access operations.
-/// Defines the contract for student-related database operations.
 /// </summary>
 public interface IStudentRepository
 {
@@ -23,7 +22,6 @@ public interface IStudentRepository
 
     /// <summary>
     /// Checks if a student with the given ID exists.
-    /// Used for duplicate ID validation.
     /// </summary>
     /// <param name="studentId">The student ID to check.</param>
     /// <returns>True if a student with this ID exists, otherwise false.</returns>

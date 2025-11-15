@@ -14,19 +14,16 @@ namespace SchoolManagement.Tests.Services;
 public class SchoolClassServiceTests
 {
     private readonly Mock<ISchoolClassRepository> _mockClassRepository;
-    private readonly Mock<IStudentRepository> _mockStudentRepository;
     private readonly Mock<ILogger<SchoolClassService>> _mockLogger;
     private readonly SchoolClassService _sut;
 
     public SchoolClassServiceTests()
     {
         _mockClassRepository = new Mock<ISchoolClassRepository>();
-        _mockStudentRepository = new Mock<IStudentRepository>();
         _mockLogger = new Mock<ILogger<SchoolClassService>>();
         
         _sut = new SchoolClassService(
             _mockClassRepository.Object,
-            _mockStudentRepository.Object,
             _mockLogger.Object);
     }
 
@@ -305,187 +302,6 @@ public class SchoolClassServiceTests
         result.Status.Should().Be(ServiceResultStatus.Ok);
         students.All(s => s.SchoolClassId == null).Should().BeTrue();
         _mockClassRepository.Verify(r => r.DeleteAsync(It.IsAny<SchoolClass>()), Times.Once);
-    }
-
-    #endregion
-
-    #region AddStudentToClassAsync Tests
-
-    [Fact]
-    public async Task AddStudentToClassAsync_WithValidData_ShouldAddStudent()
-    {
-        // Arrange
-        var schoolClass = new SchoolClass
-        {
-            Id = 1,
-            Name = "Class 5A",
-            LeadingTeacher = "Mrs. Smith",
-            Students = new List<Student>()
-        };
-
-        var student = new Student
-        {
-            StudentId = "S001",
-            Name = "John",
-            Surname = "Doe",
-            DateOfBirth = new DateTime(2005, 1, 1)
-        };
-
-        _mockClassRepository.Setup(r => r.GetByIdWithStudentsAsync(1))
-            .ReturnsAsync(schoolClass);
-        
-        _mockStudentRepository.Setup(r => r.GetByIdAsync("S001"))
-            .ReturnsAsync(student);
-        
-        _mockStudentRepository.Setup(r => r.UpdateAsync(It.IsAny<Student>()))
-            .Returns(Task.CompletedTask);
-
-        // Act
-        var result = await _sut.AddStudentToClassAsync(1, "S001");
-
-        // Assert
-        result.Should().NotBeNull();
-        result.Status.Should().Be(ServiceResultStatus.Ok);
-        _mockStudentRepository.Verify(r => r.UpdateAsync(It.Is<Student>(s => s.SchoolClassId == 1)), Times.Once);
-    }
-
-    [Fact]
-    public async Task AddStudentToClassAsync_ToFullClass_ShouldReturnBadRequest()
-    {
-        // Arrange
-        var fullClass = new SchoolClass
-        {
-            Id = 1,
-            Name = "Class 5A",
-            LeadingTeacher = "Mrs. Smith",
-            Students = Enumerable.Range(1, BusinessConstants.MaxStudentsPerClass)
-                .Select(i => new Student { StudentId = $"S{i:000}" })
-                .ToList()
-        };
-
-        _mockClassRepository.Setup(r => r.GetByIdWithStudentsAsync(1))
-            .ReturnsAsync(fullClass);
-
-        // Act
-        var result = await _sut.AddStudentToClassAsync(1, "S999");
-
-        // Assert
-        result.Should().NotBeNull();
-        result.Status.Should().Be(ServiceResultStatus.BadRequest);
-        result.ErrorMessage.Should().Contain("maximum");
-    }
-
-    [Fact]
-    public async Task AddStudentToClassAsync_StudentAlreadyInClass_ShouldReturnBadRequest()
-    {
-        // Arrange
-        var schoolClass = new SchoolClass
-        {
-            Id = 1,
-            Name = "Class 5A",
-            LeadingTeacher = "Mrs. Smith",
-            Students = new List<Student>()
-        };
-
-        var student = new Student
-        {
-            StudentId = "S001",
-            Name = "John",
-            Surname = "Doe",
-            DateOfBirth = new DateTime(2005, 1, 1),
-            SchoolClassId = 1
-        };
-
-        _mockClassRepository.Setup(r => r.GetByIdWithStudentsAsync(1))
-            .ReturnsAsync(schoolClass);
-        
-        _mockStudentRepository.Setup(r => r.GetByIdAsync("S001"))
-            .ReturnsAsync(student);
-
-        // Act
-        var result = await _sut.AddStudentToClassAsync(1, "S001");
-
-        // Assert
-        result.Should().NotBeNull();
-        result.Status.Should().Be(ServiceResultStatus.BadRequest);
-        result.ErrorMessage.Should().Contain("already");
-    }
-
-    #endregion
-
-    #region RemoveStudentFromClassAsync Tests
-
-    [Fact]
-    public async Task RemoveStudentFromClassAsync_WithValidData_ShouldRemoveStudent()
-    {
-        // Arrange
-        var schoolClass = new SchoolClass
-        {
-            Id = 1,
-            Name = "Class 5A",
-            LeadingTeacher = "Mrs. Smith"
-        };
-
-        var student = new Student
-        {
-            StudentId = "S001",
-            Name = "John",
-            Surname = "Doe",
-            DateOfBirth = new DateTime(2005, 1, 1),
-            SchoolClassId = 1
-        };
-
-        _mockClassRepository.Setup(r => r.GetByIdAsync(1))
-            .ReturnsAsync(schoolClass);
-        
-        _mockStudentRepository.Setup(r => r.GetByIdAsync("S001"))
-            .ReturnsAsync(student);
-        
-        _mockStudentRepository.Setup(r => r.UpdateAsync(It.IsAny<Student>()))
-            .Returns(Task.CompletedTask);
-
-        // Act
-        var result = await _sut.RemoveStudentFromClassAsync(1, "S001");
-
-        // Assert
-        result.Should().NotBeNull();
-        result.Status.Should().Be(ServiceResultStatus.Ok);
-        _mockStudentRepository.Verify(r => r.UpdateAsync(It.Is<Student>(s => s.SchoolClassId == null)), Times.Once);
-    }
-
-    [Fact]
-    public async Task RemoveStudentFromClassAsync_StudentNotInClass_ShouldReturnBadRequest()
-    {
-        // Arrange
-        var schoolClass = new SchoolClass
-        {
-            Id = 1,
-            Name = "Class 5A",
-            LeadingTeacher = "Mrs. Smith"
-        };
-
-        var student = new Student
-        {
-            StudentId = "S001",
-            Name = "John",
-            Surname = "Doe",
-            DateOfBirth = new DateTime(2005, 1, 1),
-            SchoolClassId = 2 // Different class
-        };
-
-        _mockClassRepository.Setup(r => r.GetByIdAsync(1))
-            .ReturnsAsync(schoolClass);
-        
-        _mockStudentRepository.Setup(r => r.GetByIdAsync("S001"))
-            .ReturnsAsync(student);
-
-        // Act
-        var result = await _sut.RemoveStudentFromClassAsync(1, "S001");
-
-        // Assert
-        result.Should().NotBeNull();
-        result.Status.Should().Be(ServiceResultStatus.BadRequest);
-        result.ErrorMessage.Should().Contain("not in");
     }
 
     #endregion
