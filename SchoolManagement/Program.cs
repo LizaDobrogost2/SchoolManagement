@@ -125,13 +125,6 @@ try
     // Map health check endpoints
     app.MapHealthEndpoints();
 
-    // Test endpoints (remove in production)
-    if (app.Environment.IsDevelopment())
-    {
-        app.MapTestEndpoints()
-            .WithApiVersionSet(apiVersionSet);
-    }
-
     Log.Information("SchoolManagement API started successfully");
     app.Run();
 }

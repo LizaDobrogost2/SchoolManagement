@@ -225,19 +225,3 @@ X-Api-Version: 1.0
 ### Test without version (should use default v1.0)
 GET https://localhost:5001/api/v1/students
 
-### ============================================
-### EXCEPTION HANDLER TESTING (Development Only)
-### ============================================
-
-### Test General Exception (500 Internal Server Error)
-GET https://localhost:5001/api/v1/test/exception
-
-### Test Argument Exception (400 Bad Request)
-GET https://localhost:5001/api/v1/test/argument-exception
-
-### Test Not Implemented Exception (501 Not Implemented)
-GET https://localhost:5001/api/v1/test/not-implemented
-
-### Test Timeout Exception (408 Request Timeout)
-GET https://localhost:5001/api/v1/test/timeout
-
