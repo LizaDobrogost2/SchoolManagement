@@ -1,0 +1,320 @@
+### School Management API - Test Requests
+### Use this file with VS Code REST Client extension or similar tools
+
+@baseUrl = https://localhost:5001
+@contentType = application/json
+
+###############################
+# CLASSES - CRUD OPERATIONS
+###############################
+
+### 1. Create Class 1
+POST {{baseUrl}}/api/classes
+Content-Type: {{contentType}}
+
+{
+  "name": "Class 5A",
+  "leadingTeacher": "Mrs. Smith"
+}
+
+### 2. Create Class 2
+POST {{baseUrl}}/api/classes
+Content-Type: {{contentType}}
+
+{
+  "name": "Class 6B",
+  "leadingTeacher": "Mr. Johnson"
+}
+
+### 3. Create Class 3
+POST {{baseUrl}}/api/classes
+Content-Type: {{contentType}}
+
+{
+  "name": "Mathematics 101",
+  "leadingTeacher": "Prof. Anderson"
+}
+
+### 4. Get All Classes
+GET {{baseUrl}}/api/classes
+
+### 5. Get Class by ID
+GET {{baseUrl}}/api/classes/1
+
+### 6. Update Class (PUT - Full Update)
+PUT {{baseUrl}}/api/classes/1
+Content-Type: {{contentType}}
+
+{
+  "name": "Class 5A Advanced",
+  "leadingTeacher": "Dr. Smith"
+}
+
+### 7. Partial Update Class (PATCH - RESTful) ? NEW
+PATCH {{baseUrl}}/api/classes/1
+Content-Type: {{contentType}}
+
+{
+  "name": "Class 5A Elite"
+}
+
+### 8. Delete Class
+# DELETE {{baseUrl}}/api/classes/3
+
+###############################
+# STUDENTS - CRUD OPERATIONS
+###############################
+
+### 9. Create Student 1 (with all fields)
+POST {{baseUrl}}/api/students
+Content-Type: {{contentType}}
+
+{
+  "studentId": "S001",
+  "name": "John",
+  "surname": "Doe",
+  "dateOfBirth": "2005-05-15",
+  "city": "New York",
+  "street": "123 Main St",
+  "postalCode": "10001"
+}
+
+### 10. Create Student 2
+POST {{baseUrl}}/api/students
+Content-Type: {{contentType}}
+
+{
+  "studentId": "S002",
+  "name": "Jane",
+  "surname": "Smith",
+  "dateOfBirth": "2006-03-20",
+  "city": "Boston",
+  "street": "456 Oak Ave",
+  "postalCode": "02101"
+}
+
+### 11. Create Student 3 (minimal - only required fields)
+POST {{baseUrl}}/api/students
+Content-Type: {{contentType}}
+
+{
+  "studentId": "S003",
+  "name": "Bob",
+  "surname": "Wilson",
+  "dateOfBirth": "2005-11-30"
+}
+
+### 12. Create Student 4
+POST {{baseUrl}}/api/students
+Content-Type: {{contentType}}
+
+{
+  "studentId": "S004",
+  "name": "Alice",
+  "surname": "Johnson",
+  "dateOfBirth": "2005-01-15",
+  "city": "Chicago"
+}
+
+### 13. Create Student 5
+POST {{baseUrl}}/api/students
+Content-Type: {{contentType}}
+
+{
+  "studentId": "S005",
+  "name": "Charlie",
+  "surname": "Brown",
+  "dateOfBirth": "2006-07-22"
+}
+
+### 14. Get All Students
+GET {{baseUrl}}/api/students
+
+### 15. Get Student by ID
+GET {{baseUrl}}/api/students/S001
+
+### 16. Update Student (PUT - Full Update)
+PUT {{baseUrl}}/api/students/S001
+Content-Type: {{contentType}}
+
+{
+  "name": "John Updated",
+  "surname": "Doe",
+  "dateOfBirth": "2005-05-15",
+  "city": "Los Angeles",
+  "street": "789 Pine Ave",
+  "postalCode": "90001"
+}
+
+### 17. Partial Update Student (PATCH - RESTful) ? NEW
+PATCH {{baseUrl}}/api/students/S001
+Content-Type: {{contentType}}
+
+{
+  "city": "San Francisco"
+}
+
+### 18. Delete Student
+# DELETE {{baseUrl}}/api/students/S005
+
+###############################
+# STUDENT-CLASS ASSIGNMENT (RESTful PATCH Approach) ? RECOMMENDED
+###############################
+
+### 19. Assign Student to Class (RESTful Way) ? RECOMMENDED
+PATCH {{baseUrl}}/api/students/S001
+Content-Type: {{contentType}}
+
+{
+  "schoolClassId": 1
+}
+
+### 20. Move Student to Different Class (RESTful Way) ? RECOMMENDED
+PATCH {{baseUrl}}/api/students/S002
+Content-Type: {{contentType}}
+
+{
+  "schoolClassId": 1
+}
+
+### 21. Unassign Student from Class (RESTful Way) ? RECOMMENDED
+PATCH {{baseUrl}}/api/students/S002
+Content-Type: {{contentType}}
+
+{
+  "schoolClassId": null
+}
+
+### 22. Assign to Class with ID 0 (Alternative to null) ? RECOMMENDED
+PATCH {{baseUrl}}/api/students/S002
+Content-Type: {{contentType}}
+
+{
+  "schoolClassId": 0
+}
+
+###############################
+# LEGACY CLASS-STUDENT OPERATIONS (Deprecated but still supported)
+###############################
+
+### 23. Add Student to Class (DEPRECATED - Use PATCH instead)
+# POST {{baseUrl}}/api/classes/1/students
+# Content-Type: {{contentType}}
+# 
+# {
+#   "studentId": "S001"
+# }
+
+### 24. Remove Student from Class (DEPRECATED - Use PATCH instead)
+# DELETE {{baseUrl}}/api/classes/1/students/S002
+
+###############################
+# VIEW OPERATIONS
+###############################
+
+### 25. Get Class with Students
+GET {{baseUrl}}/api/classes/1
+
+###############################
+# VALIDATION TESTS
+###############################
+
+### 26. TEST: Create Duplicate Student (Should Fail - 409 Conflict)
+POST {{baseUrl}}/api/students
+Content-Type: {{contentType}}
+
+{
+  "studentId": "S001",
+  "name": "Duplicate",
+  "surname": "Student",
+  "dateOfBirth": "2005-01-01"
+}
+
+### 27. TEST: Create Student with Missing Required Fields (Should Fail - 400 Bad Request)
+POST {{baseUrl}}/api/students
+Content-Type: {{contentType}}
+
+{
+  "studentId": "S999",
+  "surname": "Missing Name",
+  "dateOfBirth": "2005-01-01"
+}
+
+### 28. TEST: Get Non-Existent Student (Should Fail - 404 Not Found)
+GET {{baseUrl}}/api/students/S999
+
+### 29. TEST: Assign Student to Non-Existent Class (Should Fail - 404 Not Found)
+PATCH {{baseUrl}}/api/students/S001
+Content-Type: {{contentType}}
+
+{
+  "schoolClassId": 999
+}
+
+### 30. TEST: Create Class with Missing Fields (Should Fail - 400 Bad Request)
+POST {{baseUrl}}/api/classes
+Content-Type: {{contentType}}
+
+{
+  "name": "Missing Teacher Class"
+}
+
+###############################
+# BULK DATA FOR CLASS SIZE TEST
+###############################
+
+### Create Students 6-10 for Testing
+POST {{baseUrl}}/api/students
+Content-Type: {{contentType}}
+
+{
+  "studentId": "S006",
+  "name": "Student",
+  "surname": "Six",
+  "dateOfBirth": "2005-01-01"
+}
+
+###
+POST {{baseUrl}}/api/students
+Content-Type: {{contentType}}
+
+{
+  "studentId": "S007",
+  "name": "Student",
+  "surname": "Seven",
+  "dateOfBirth": "2005-01-01"
+}
+
+###
+POST {{baseUrl}}/api/students
+Content-Type: {{contentType}}
+
+{
+  "studentId": "S008",
+  "name": "Student",
+  "surname": "Eight",
+  "dateOfBirth": "2005-01-01"
+}
+
+### TEST: Try to assign student to full class (Should Fail - 400 Bad Request)
+# First assign 20 students to a class using PATCH
+# PATCH {{baseUrl}}/api/students/S006
+# Content-Type: {{contentType}}
+# {"schoolClassId": 1}
+# ... repeat for S007-S020
+# Then try to add 21st student
+
+###############################
+# CLEANUP OPERATIONS
+###############################
+
+### Delete All Test Students (Uncomment to use)
+# DELETE {{baseUrl}}/api/students/S001
+# DELETE {{baseUrl}}/api/students/S002
+# DELETE {{baseUrl}}/api/students/S003
+# DELETE {{baseUrl}}/api/students/S004
+# DELETE {{baseUrl}}/api/students/S005
+
+### Delete All Test Classes (Uncomment to use)
+# DELETE {{baseUrl}}/api/classes/1
+# DELETE {{baseUrl}}/api/classes/2

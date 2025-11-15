@@ -1,0 +1,192 @@
+### School Management API - Test Requests
+
+### ============================================
+### STUDENT ENDPOINTS
+### ============================================
+
+### Get All Students
+GET https://localhost:5001/api/students
+
+### Get Student by ID
+GET https://localhost:5001/api/students/S001
+
+### Create Student (All fields)
+POST https://localhost:5001/api/students
+Content-Type: application/json
+
+{
+  "studentId": "S001",
+  "name": "John",
+  "surname": "Doe",
+  "dateOfBirth": "2005-05-15",
+  "city": "New York",
+  "street": "123 Main St",
+  "postalCode": "10001"
+}
+
+### Create Student (Required fields only)
+POST https://localhost:5001/api/students
+Content-Type: application/json
+
+{
+  "studentId": "S002",
+  "name": "Jane",
+  "surname": "Smith",
+  "dateOfBirth": "2006-03-20"
+}
+
+### Create Another Student
+POST https://localhost:5001/api/students
+Content-Type: application/json
+
+{
+  "studentId": "S003",
+  "name": "Bob",
+  "surname": "Johnson",
+  "dateOfBirth": "2005-08-10",
+  "city": "Boston"
+}
+
+### Try to create duplicate student (should fail)
+POST https://localhost:5001/api/students
+Content-Type: application/json
+
+{
+  "studentId": "S001",
+  "name": "Another",
+  "surname": "Person",
+  "dateOfBirth": "2005-01-01"
+}
+
+### Update Student
+PUT https://localhost:5001/api/students/S001
+Content-Type: application/json
+
+{
+  "name": "John Updated",
+  "surname": "Doe",
+  "dateOfBirth": "2005-05-15",
+  "city": "Los Angeles",
+  "street": "456 New Ave",
+  "postalCode": "90001"
+}
+
+### Delete Student
+DELETE https://localhost:5001/api/students/S003
+
+### ============================================
+### SCHOOL CLASS ENDPOINTS
+### ============================================
+
+### Get All Classes
+GET https://localhost:5001/api/classes
+
+### Get Class by ID
+GET https://localhost:5001/api/classes/1
+
+### Create Class
+POST https://localhost:5001/api/classes
+Content-Type: application/json
+
+{
+  "name": "Class 5A",
+  "leadingTeacher": "Mrs. Smith"
+}
+
+### Create Another Class
+POST https://localhost:5001/api/classes
+Content-Type: application/json
+
+{
+  "name": "Class 5B",
+  "leadingTeacher": "Mr. Johnson"
+}
+
+### Update Class
+PUT https://localhost:5001/api/classes/1
+Content-Type: application/json
+
+{
+  "name": "Class 5A Advanced",
+  "leadingTeacher": "Mrs. Smith-Brown"
+}
+
+### Delete Class
+DELETE https://localhost:5001/api/classes/2
+
+### ============================================
+### CLASS-STUDENT ASSIGNMENT ENDPOINTS
+### ============================================
+
+### Add Student to Class
+POST https://localhost:5001/api/classes/1/students
+Content-Type: application/json
+
+{
+  "studentId": "S001"
+}
+
+### Add Another Student to Class
+POST https://localhost:5001/api/classes/1/students
+Content-Type: application/json
+
+{
+  "studentId": "S002"
+}
+
+### Try to add same student again (should fail)
+POST https://localhost:5001/api/classes/1/students
+Content-Type: application/json
+
+{
+  "studentId": "S001"
+}
+
+### Remove Student from Class
+DELETE https://localhost:5001/api/classes/1/students/S002
+
+### ============================================
+### TEST MAXIMUM STUDENTS LIMIT (20)
+### ============================================
+
+### Create 20 students and add them to test the limit
+### Student 1
+POST https://localhost:5001/api/students
+Content-Type: application/json
+
+{
+  "studentId": "T001",
+  "name": "Test1",
+  "surname": "Student",
+  "dateOfBirth": "2005-01-01"
+}
+
+### Add to class
+POST https://localhost:5001/api/classes/1/students
+Content-Type: application/json
+
+{
+  "studentId": "T001"
+}
+
+### Continue creating T002 through T019 and adding them...
+### (Repeat the above two requests with T002, T003... T019)
+
+### Try to add 21st student (should fail)
+POST https://localhost:5001/api/students
+Content-Type: application/json
+
+{
+  "studentId": "T020",
+  "name": "Test20",
+  "surname": "Student",
+  "dateOfBirth": "2005-01-01"
+}
+
+POST https://localhost:5001/api/classes/1/students
+Content-Type: application/json
+
+{
+  "studentId": "T020"
+}
+
