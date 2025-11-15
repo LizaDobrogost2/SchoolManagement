@@ -1,4 +1,4 @@
-# School Management API - Complete Refactoring
+# School Management API 
 
 ## Business Requirements 
 
@@ -61,7 +61,7 @@ dotnet run
 
 Access Swagger UI: `https://localhost:<port>/swagger`
 
-## ?? Next Steps (Optional Enhancements)
+## Next Steps (Optional Enhancements)
 
 While the current implementation meets all requirements, you could consider:
 
@@ -75,15 +75,3 @@ While the current implementation meets all requirements, you could consider:
 8. **Unit Tests**: Add comprehensive unit test suite
 9. **Integration Tests**: Add integration tests
 10. **Docker**: Add Dockerfile for containerization
-
-## ?? Contributing
-
-The code is now organized to make contributions easy:
-1. Identify which layer needs changes
-2. Update relevant interface/class
-3. Add tests
-4. Submit changes
-
----
-
-**Built with ?? using .NET 9 and best practices**
