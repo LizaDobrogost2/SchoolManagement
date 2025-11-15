@@ -39,9 +39,6 @@ Then open your browser to:
 - **API Base URL**: `https://localhost:5001/api/v1` (.NET) or `http://localhost:5000/api/v1` (Docker)
 - **Health Check**: `http://localhost:5000/health` (Docker)
 
-See **[QUICKSTART.md](QUICKSTART.md)** for detailed testing examples.
-See **[DOCKER_GUIDE.md](DOCKER_GUIDE.md)** for complete Docker documentation.
-
 ## Testing
 
 ```bash
