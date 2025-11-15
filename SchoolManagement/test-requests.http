@@ -1,17 +1,21 @@
-### School Management API - Test Requests
+### School Management API - Test Requests (API v1)
 
 ### ============================================
 ### STUDENT ENDPOINTS
 ### ============================================
 
 ### Get All Students
-GET https://localhost:5001/api/students
+GET https://localhost:5001/api/v1/students
+
+### Get All Students (using header versioning)
+GET https://localhost:5001/api/v1/students
+X-Api-Version: 1.0
 
 ### Get Student by ID
-GET https://localhost:5001/api/students/S001
+GET https://localhost:5001/api/v1/students/S001
 
 ### Create Student (All fields)
-POST https://localhost:5001/api/students
+POST https://localhost:5001/api/v1/students
 Content-Type: application/json
 
 {
@@ -25,7 +29,7 @@ Content-Type: application/json
 }
 
 ### Create Student (Required fields only)
-POST https://localhost:5001/api/students
+POST https://localhost:5001/api/v1/students
 Content-Type: application/json
 
 {
@@ -36,7 +40,7 @@ Content-Type: application/json
 }
 
 ### Create Another Student
-POST https://localhost:5001/api/students
+POST https://localhost:5001/api/v1/students
 Content-Type: application/json
 
 {
@@ -48,7 +52,7 @@ Content-Type: application/json
 }
 
 ### Try to create duplicate student (should fail)
-POST https://localhost:5001/api/students
+POST https://localhost:5001/api/v1/students
 Content-Type: application/json
 
 {
@@ -59,7 +63,7 @@ Content-Type: application/json
 }
 
 ### Update Student
-PUT https://localhost:5001/api/students/S001
+PUT https://localhost:5001/api/v1/students/S001
 Content-Type: application/json
 
 {
@@ -72,20 +76,20 @@ Content-Type: application/json
 }
 
 ### Delete Student
-DELETE https://localhost:5001/api/students/S003
+DELETE https://localhost:5001/api/v1/students/S003
 
 ### ============================================
 ### SCHOOL CLASS ENDPOINTS
 ### ============================================
 
 ### Get All Classes
-GET https://localhost:5001/api/classes
+GET https://localhost:5001/api/v1/classes
 
 ### Get Class by ID
-GET https://localhost:5001/api/classes/1
+GET https://localhost:5001/api/v1/classes/1
 
 ### Create Class
-POST https://localhost:5001/api/classes
+POST https://localhost:5001/api/v1/classes
 Content-Type: application/json
 
 {
@@ -94,7 +98,7 @@ Content-Type: application/json
 }
 
 ### Create Another Class
-POST https://localhost:5001/api/classes
+POST https://localhost:5001/api/v1/classes
 Content-Type: application/json
 
 {
@@ -103,7 +107,7 @@ Content-Type: application/json
 }
 
 ### Update Class
-PUT https://localhost:5001/api/classes/1
+PUT https://localhost:5001/api/v1/classes/1
 Content-Type: application/json
 
 {
@@ -112,22 +116,22 @@ Content-Type: application/json
 }
 
 ### Delete Class
-DELETE https://localhost:5001/api/classes/2
+DELETE https://localhost:5001/api/v1/classes/2
 
 ### ============================================
 ### CLASS-STUDENT ASSIGNMENT ENDPOINTS
 ### ============================================
 
-### Add Student to Class
-POST https://localhost:5001/api/classes/1/students
+### Add Student to Class (Deprecated - use PATCH student instead)
+POST https://localhost:5001/api/v1/classes/1/students
 Content-Type: application/json
 
 {
   "studentId": "S001"
 }
 
-### Add Another Student to Class
-POST https://localhost:5001/api/classes/1/students
+### Add Another Student to Class (Deprecated)
+POST https://localhost:5001/api/v1/classes/1/students
 Content-Type: application/json
 
 {
@@ -135,15 +139,35 @@ Content-Type: application/json
 }
 
 ### Try to add same student again (should fail)
-POST https://localhost:5001/api/classes/1/students
+POST https://localhost:5001/api/v1/classes/1/students
 Content-Type: application/json
 
 {
   "studentId": "S001"
 }
 
-### Remove Student from Class
-DELETE https://localhost:5001/api/classes/1/students/S002
+### Remove Student from Class (Deprecated)
+DELETE https://localhost:5001/api/v1/classes/1/students/S002
+
+### ============================================
+### RECOMMENDED: ASSIGN STUDENT TO CLASS (REST-compliant)
+### ============================================
+
+### Assign Student to Class (PATCH - Recommended)
+PATCH https://localhost:5001/api/v1/students/S001
+Content-Type: application/json
+
+{
+  "schoolClassId": 1
+}
+
+### Unassign Student from Class (PATCH - Recommended)
+PATCH https://localhost:5001/api/v1/students/S001
+Content-Type: application/json
+
+{
+  "schoolClassId": null
+}
 
 ### ============================================
 ### TEST MAXIMUM STUDENTS LIMIT (20)
@@ -151,7 +175,7 @@ DELETE https://localhost:5001/api/classes/1/students/S002
 
 ### Create 20 students and add them to test the limit
 ### Student 1
-POST https://localhost:5001/api/students
+POST https://localhost:5001/api/v1/students
 Content-Type: application/json
 
 {
@@ -161,19 +185,19 @@ Content-Type: application/json
   "dateOfBirth": "2005-01-01"
 }
 
-### Add to class
-POST https://localhost:5001/api/classes/1/students
+### Add to class using PATCH
+PATCH https://localhost:5001/api/v1/students/T001
 Content-Type: application/json
 
 {
-  "studentId": "T001"
+  "schoolClassId": 1
 }
 
 ### Continue creating T002 through T019 and adding them...
 ### (Repeat the above two requests with T002, T003... T019)
 
 ### Try to add 21st student (should fail)
-POST https://localhost:5001/api/students
+POST https://localhost:5001/api/v1/students
 Content-Type: application/json
 
 {
@@ -183,10 +207,37 @@ Content-Type: application/json
   "dateOfBirth": "2005-01-01"
 }
 
-POST https://localhost:5001/api/classes/1/students
+PATCH https://localhost:5001/api/v1/students/T020
 Content-Type: application/json
 
 {
-  "studentId": "T020"
+  "schoolClassId": 1
 }
+
+### ============================================
+### API VERSION TESTING
+### ============================================
+
+### Test API Version in Header
+GET https://localhost:5001/api/v1/students
+X-Api-Version: 1.0
+
+### Test without version (should use default v1.0)
+GET https://localhost:5001/api/v1/students
+
+### ============================================
+### EXCEPTION HANDLER TESTING (Development Only)
+### ============================================
+
+### Test General Exception (500 Internal Server Error)
+GET https://localhost:5001/api/v1/test/exception
+
+### Test Argument Exception (400 Bad Request)
+GET https://localhost:5001/api/v1/test/argument-exception
+
+### Test Not Implemented Exception (501 Not Implemented)
+GET https://localhost:5001/api/v1/test/not-implemented
+
+### Test Timeout Exception (408 Request Timeout)
+GET https://localhost:5001/api/v1/test/timeout
 

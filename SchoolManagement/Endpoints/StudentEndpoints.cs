@@ -1,47 +1,58 @@
 using SchoolManagement.Models;
 using SchoolManagement.Services;
+using Asp.Versioning;
+using Asp.Versioning.Builder;
 
 namespace SchoolManagement.Endpoints;
 
 public static class StudentEndpoints
 {
-    public static void MapStudentEndpoints(this IEndpointRouteBuilder app)
+    public static RouteGroupBuilder MapStudentEndpoints(this IEndpointRouteBuilder app)
     {
-        var group = app.MapGroup("/api/students")
-            .WithTags("Students");
+        var group = app.MapGroup("/api/v{version:apiVersion}/students")
+            .WithTags("Students")
+            .WithOpenApi();
 
         group.MapGet("/", GetAllStudents)
             .WithName("GetAllStudents")
-            .Produces<IEnumerable<StudentDto>>();
+            .Produces<IEnumerable<StudentDto>>()
+            .MapToApiVersion(1.0);
 
         group.MapGet("/{id}", GetStudentById)
             .WithName("GetStudentById")
             .Produces<StudentDto>()
-            .Produces(StatusCodes.Status404NotFound);
+            .Produces(StatusCodes.Status404NotFound)
+            .MapToApiVersion(1.0);
 
         group.MapPost("/", CreateStudent)
             .WithName("CreateStudent")
             .Produces<StudentDto>(StatusCodes.Status201Created)
             .Produces(StatusCodes.Status400BadRequest)
-            .Produces(StatusCodes.Status409Conflict);
+            .Produces(StatusCodes.Status409Conflict)
+            .MapToApiVersion(1.0);
 
         group.MapPut("/{id}", UpdateStudent)
             .WithName("UpdateStudent")
             .Produces<StudentDto>()
             .Produces(StatusCodes.Status400BadRequest)
-            .Produces(StatusCodes.Status404NotFound);
+            .Produces(StatusCodes.Status404NotFound)
+            .MapToApiVersion(1.0);
 
         group.MapPatch("/{id}", PatchStudent)
             .WithName("PatchStudent")
             .WithDescription("Partially update a student. Use this to assign/unassign students to/from classes.")
             .Produces<StudentDto>()
             .Produces(StatusCodes.Status400BadRequest)
-            .Produces(StatusCodes.Status404NotFound);
+            .Produces(StatusCodes.Status404NotFound)
+            .MapToApiVersion(1.0);
 
         group.MapDelete("/{id}", DeleteStudent)
             .WithName("DeleteStudent")
             .Produces<object>()
-            .Produces(StatusCodes.Status404NotFound);
+            .Produces(StatusCodes.Status404NotFound)
+            .MapToApiVersion(1.0);
+
+        return group;
     }
 
     private static async Task<IResult> GetAllStudents(IStudentService studentService)
@@ -60,7 +71,7 @@ public static class StudentEndpoints
     {
         var result = await studentService.CreateStudentAsync(dto);
         return result.Status == ServiceResultStatus.Created
-            ? Results.Created($"/api/students/{result.Data?.StudentId}", result.Data)
+            ? Results.Created($"/api/v1/students/{result.Data?.StudentId}", result.Data)
             : result.ToHttpResult();
     }
 

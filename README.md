@@ -28,29 +28,52 @@ dotnet run
 
 Then open your browser to:
 - **Swagger UI**: `https://localhost:5001/swagger`
-- **API Base URL**: `https://localhost:5001`
+- **API Base URL**: `https://localhost:5001/api/v1`
 
 See **[QUICKSTART.md](QUICKSTART.md)** for detailed testing examples.
 
-## API Endpoints
+## API Endpoints (v1)
 
-All endpoints:
+All endpoints are versioned. Current version: **v1.0**
 
 ### Students
-- `GET /api/students` - List all
-- `GET /api/students/{id}` - Get by ID
-- `POST /api/students` - Create
-- `PUT /api/students/{id}` - Update
-- `DELETE /api/students/{id}` - Delete
+- `GET /api/v1/students` - List all
+- `GET /api/v1/students/{id}` - Get by ID
+- `POST /api/v1/students` - Create
+- `PUT /api/v1/students/{id}` - Update (full)
+- `PATCH /api/v1/students/{id}` - Update (partial) - **Use for class assignments**
+- `DELETE /api/v1/students/{id}` - Delete
 
 ### Classes
-- `GET /api/classes` - List all
-- `GET /api/classes/{id}` - Get by ID
-- `POST /api/classes` - Create
-- `PUT /api/classes/{id}` - Update
-- `DELETE /api/classes/{id}` - Delete
-- `POST /api/classes/{classId}/students` - Add student
-- `DELETE /api/classes/{classId}/students/{studentId}` - Remove student
+- `GET /api/v1/classes` - List all
+- `GET /api/v1/classes/{id}` - Get by ID
+- `POST /api/v1/classes` - Create
+- `PUT /api/v1/classes/{id}` - Update (full)
+- `PATCH /api/v1/classes/{id}` - Update (partial)
+- `DELETE /api/v1/classes/{id}` - Delete
+- ~~`POST /api/v1/classes/{classId}/students`~~ - **Deprecated** (use PATCH student instead)
+- ~~`DELETE /api/v1/classes/{classId}/students/{studentId}`~~ - **Deprecated** (use PATCH student instead)
+
+### Assigning Students to Classes
+
+**Recommended approach** (RESTful):
+```http
+PATCH /api/v1/students/S001
+Content-Type: application/json
+
+{
+  "schoolClassId": 1  // Assign to class
+}
+```
+
+```http
+PATCH /api/v1/students/S001
+Content-Type: application/json
+
+{
+  "schoolClassId": null  // Unassign from class
+}
+```
 
 ## Running the Application
 
@@ -61,17 +84,3 @@ dotnet run
 
 Access Swagger UI: `https://localhost:<port>/swagger`
 
-## Next Steps (Optional Enhancements)
-
-While the current implementation meets all requirements, you could consider:
-
-1. **Validation**: Add FluentValidation for complex rules
-2. **Logging**: Add Serilog for structured logging
-3. **Caching**: Add response caching for GET endpoints
-4. **Health Checks**: Add health check endpoints
-5. **API Versioning**: Add versioning support
-6. **Rate Limiting**: Add rate limiting middleware
-7. **Global Exception Handling**: Add global exception handler
-8. **Unit Tests**: Add comprehensive unit test suite
-9. **Integration Tests**: Add integration tests
-10. **Docker**: Add Dockerfile for containerization
