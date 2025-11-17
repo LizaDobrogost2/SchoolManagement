@@ -5,7 +5,7 @@ using Serilog;
 try
 {
     LoggingConfiguration.ConfigureSerilog();
-    
+
     Log.Information("Starting SchoolManagement API");
 
     var builder = WebApplication.CreateBuilder(args);
@@ -41,4 +41,6 @@ finally
     Log.CloseAndFlush();
 }
 
+
+// Make Program class accessible for integration tests
 public partial class Program { }
