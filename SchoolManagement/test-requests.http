@@ -1,21 +1,40 @@
 ### School Management API - Test Requests (API v1)
+### Base URL (HTTP): http://localhost:5272
+### Base URL (HTTPS): https://localhost:7070
+### Note: Make sure the application is running before executing these requests
 
 ### ============================================
-### STUDENT ENDPOINTS
+### HEALTH CHECK ENDPOINTS
+### ============================================
+
+### Health Check - Full
+GET https://localhost:7070/health
+
+### Health Check - Liveness
+GET https://localhost:7070/health/live
+
+### Health Check - Readiness
+GET https://localhost:7070/health/ready
+
+### ============================================
+### STUDENT ENDPOINTS - CRUD OPERATIONS
 ### ============================================
 
 ### Get All Students
-GET https://localhost:5001/api/v1/students
+GET https://localhost:7070/api/v1/students
 
 ### Get All Students (using header versioning)
-GET https://localhost:5001/api/v1/students
+GET https://localhost:7070/api/v1/students
 X-Api-Version: 1.0
 
 ### Get Student by ID
-GET https://localhost:5001/api/v1/students/S001
+GET https://localhost:7070/api/v1/students/S001
+
+### Get Non-existent Student (should return 404)
+GET https://localhost:7070/api/v1/students/NONEXISTENT
 
 ### Create Student (All fields)
-POST https://localhost:5001/api/v1/students
+POST https://localhost:7070/api/v1/students
 Content-Type: application/json
 
 {
@@ -29,7 +48,7 @@ Content-Type: application/json
 }
 
 ### Create Student (Required fields only)
-POST https://localhost:5001/api/v1/students
+POST https://localhost:7070/api/v1/students
 Content-Type: application/json
 
 {
@@ -40,7 +59,7 @@ Content-Type: application/json
 }
 
 ### Create Another Student
-POST https://localhost:5001/api/v1/students
+POST https://localhost:7070/api/v1/students
 Content-Type: application/json
 
 {
@@ -48,11 +67,13 @@ Content-Type: application/json
   "name": "Bob",
   "surname": "Johnson",
   "dateOfBirth": "2005-08-10",
-  "city": "Boston"
+  "city": "Boston",
+  "street": "789 Oak Rd",
+  "postalCode": "02101"
 }
 
-### Try to create duplicate student (should fail)
-POST https://localhost:5001/api/v1/students
+### Try to create duplicate student (should fail with 409)
+POST https://localhost:7070/api/v1/students
 Content-Type: application/json
 
 {
@@ -62,8 +83,19 @@ Content-Type: application/json
   "dateOfBirth": "2005-01-01"
 }
 
-### Update Student
-PUT https://localhost:5001/api/v1/students/S001
+### Create Student with invalid data (should fail with 400)
+POST https://localhost:7070/api/v1/students
+Content-Type: application/json
+
+{
+  "studentId": "",
+  "name": "",
+  "surname": "",
+  "dateOfBirth": "2025-01-01"
+}
+
+### Update Student (PUT - Full Update)
+PUT https://localhost:7070/api/v1/students/S001
 Content-Type: application/json
 
 {
@@ -75,21 +107,56 @@ Content-Type: application/json
   "postalCode": "90001"
 }
 
+### Update Non-existent Student (should fail with 404)
+PUT https://localhost:7070/api/v1/students/NONEXISTENT
+Content-Type: application/json
+
+{
+  "name": "Test",
+  "surname": "User",
+  "dateOfBirth": "2005-01-01"
+}
+
+### Partial Update Student - Name and Surname (PATCH)
+PATCH https://localhost:7070/api/v1/students/S002
+Content-Type: application/json
+
+{
+  "name": "Jane Updated",
+  "surname": "Smith-Johnson"
+}
+
+### Partial Update Student - Address only (PATCH)
+PATCH https://localhost:7070/api/v1/students/S002
+Content-Type: application/json
+
+{
+  "city": "Chicago",
+  "street": "555 Lake Shore Dr",
+  "postalCode": "60611"
+}
+
 ### Delete Student
-DELETE https://localhost:5001/api/v1/students/S003
+DELETE https://localhost:7070/api/v1/students/S003
+
+### Delete Non-existent Student (should fail with 404)
+DELETE https://localhost:7070/api/v1/students/NONEXISTENT
 
 ### ============================================
-### SCHOOL CLASS ENDPOINTS
+### SCHOOL CLASS ENDPOINTS - CRUD OPERATIONS
 ### ============================================
 
 ### Get All Classes
-GET https://localhost:5001/api/v1/classes
+GET https://localhost:7070/api/v1/classes
 
 ### Get Class by ID
-GET https://localhost:5001/api/v1/classes/1
+GET https://localhost:7070/api/v1/classes/1
+
+### Get Non-existent Class (should return 404)
+GET https://localhost:7070/api/v1/classes/999
 
 ### Create Class
-POST https://localhost:5001/api/v1/classes
+POST https://localhost:7070/api/v1/classes
 Content-Type: application/json
 
 {
@@ -98,7 +165,7 @@ Content-Type: application/json
 }
 
 ### Create Another Class
-POST https://localhost:5001/api/v1/classes
+POST https://localhost:7070/api/v1/classes
 Content-Type: application/json
 
 {
@@ -106,8 +173,26 @@ Content-Type: application/json
   "leadingTeacher": "Mr. Johnson"
 }
 
-### Update Class
-PUT https://localhost:5001/api/v1/classes/1
+### Create Third Class
+POST https://localhost:7070/api/v1/classes
+Content-Type: application/json
+
+{
+  "name": "Class 6A",
+  "leadingTeacher": "Dr. Williams"
+}
+
+### Create Class with invalid data (should fail with 400)
+POST https://localhost:7070/api/v1/classes
+Content-Type: application/json
+
+{
+  "name": "",
+  "leadingTeacher": ""
+}
+
+### Update Class (PUT - Full Update)
+PUT https://localhost:7070/api/v1/classes/1
 Content-Type: application/json
 
 {
@@ -115,67 +200,88 @@ Content-Type: application/json
   "leadingTeacher": "Mrs. Smith-Brown"
 }
 
+### Update Non-existent Class (should fail with 404)
+PUT https://localhost:7070/api/v1/classes/999
+Content-Type: application/json
+
+{
+  "name": "Test Class",
+  "leadingTeacher": "Test Teacher"
+}
+
+### Partial Update Class - Name only (PATCH)
+PATCH https://localhost:7070/api/v1/classes/2
+Content-Type: application/json
+
+{
+  "name": "Class 5B Excellence"
+}
+
+### Partial Update Class - Teacher only (PATCH)
+PATCH https://localhost:7070/api/v1/classes/2
+Content-Type: application/json
+
+{
+  "leadingTeacher": "Mr. Johnson PhD"
+}
+
 ### Delete Class
-DELETE https://localhost:5001/api/v1/classes/2
+DELETE https://localhost:7070/api/v1/classes/3
+
+### Delete Non-existent Class (should fail with 404)
+DELETE https://localhost:7070/api/v1/classes/999
 
 ### ============================================
-### CLASS-STUDENT ASSIGNMENT ENDPOINTS
+### STUDENT-CLASS ASSIGNMENT
 ### ============================================
 
-### Add Student to Class (Deprecated - use PATCH student instead)
-POST https://localhost:5001/api/v1/classes/1/students
-Content-Type: application/json
-
-{
-  "studentId": "S001"
-}
-
-### Add Another Student to Class (Deprecated)
-POST https://localhost:5001/api/v1/classes/1/students
-Content-Type: application/json
-
-{
-  "studentId": "S002"
-}
-
-### Try to add same student again (should fail)
-POST https://localhost:5001/api/v1/classes/1/students
-Content-Type: application/json
-
-{
-  "studentId": "S001"
-}
-
-### Remove Student from Class (Deprecated)
-DELETE https://localhost:5001/api/v1/classes/1/students/S002
-
-### ============================================
-### RECOMMENDED: ASSIGN STUDENT TO CLASS (REST-compliant)
-### ============================================
-
-### Assign Student to Class (PATCH - Recommended)
-PATCH https://localhost:5001/api/v1/students/S001
+### Assign Student to Class 
+PATCH https://localhost:7070/api/v1/students/S001
 Content-Type: application/json
 
 {
   "schoolClassId": 1
 }
 
-### Unassign Student from Class (PATCH - Recommended)
-PATCH https://localhost:5001/api/v1/students/S001
+### Assign Another Student to Class
+PATCH https://localhost:7070/api/v1/students/S002
+Content-Type: application/json
+
+{
+  "schoolClassId": 1
+}
+
+### Reassign Student to Different Class
+PATCH https://localhost:7070/api/v1/students/S001
+Content-Type: application/json
+
+{
+  "schoolClassId": 2
+}
+
+### Unassign Student from Class (set to null)
+PATCH https://localhost:7070/api/v1/students/S001
 Content-Type: application/json
 
 {
   "schoolClassId": null
 }
 
+### Try to assign to Non-existent Class (should fail)
+PATCH https://localhost:7070/api/v1/students/S001
+Content-Type: application/json
+
+{
+  "schoolClassId": 999
+}
+
 ### ============================================
-### TEST MAXIMUM STUDENTS LIMIT (20)
+### CLASS CAPACITY TESTING (Maximum 20 Students)
 ### ============================================
 
-### Create 20 students and add them to test the limit
-### Student 1
-POST https://localhost:5001/api/v1/students
+### Create Test Students (T001-T020)
+### Student T001
+POST https://localhost:7070/api/v1/students
 Content-Type: application/json
 
 {
@@ -185,29 +291,90 @@ Content-Type: application/json
   "dateOfBirth": "2005-01-01"
 }
 
-### Add to class using PATCH
-PATCH https://localhost:5001/api/v1/students/T001
+### Assign T001 to Class
+PATCH https://localhost:7070/api/v1/students/T001
 Content-Type: application/json
 
 {
   "schoolClassId": 1
 }
 
-### Continue creating T002 through T019 and adding them...
-### (Repeat the above two requests with T002, T003... T019)
+### Student T002
+POST https://localhost:7070/api/v1/students
+Content-Type: application/json
 
-### Try to add 21st student (should fail)
-POST https://localhost:5001/api/v1/students
+{
+  "studentId": "T002",
+  "name": "Test2",
+  "surname": "Student",
+  "dateOfBirth": "2005-01-02"
+}
+
+### Assign T002 to Class
+PATCH https://localhost:7070/api/v1/students/T002
+Content-Type: application/json
+
+{
+  "schoolClassId": 1
+}
+
+### Student T003
+POST https://localhost:7070/api/v1/students
+Content-Type: application/json
+
+{
+  "studentId": "T003",
+  "name": "Test3",
+  "surname": "Student",
+  "dateOfBirth": "2005-01-03"
+}
+
+### Assign T003 to Class
+PATCH https://localhost:7070/api/v1/students/T003
+Content-Type: application/json
+
+{
+  "schoolClassId": 1
+}
+
+### Note: Continue creating students T004 through T020 using the pattern above
+### For quick testing, use the following script approach:
+
+### Create and Assign Multiple Students (T004-T020)
+### (Repeat the pattern above for T004, T005, ..., T020)
+
+### Student T020 (20th student)
+POST https://localhost:7070/api/v1/students
 Content-Type: application/json
 
 {
   "studentId": "T020",
   "name": "Test20",
   "surname": "Student",
-  "dateOfBirth": "2005-01-01"
+  "dateOfBirth": "2005-01-20"
 }
 
-PATCH https://localhost:5001/api/v1/students/T020
+### Assign T020 to Class (should succeed if class has less than 20 students)
+PATCH https://localhost:7070/api/v1/students/T020
+Content-Type: application/json
+
+{
+  "schoolClassId": 1
+}
+
+### Student T021 (21st student - should fail to assign)
+POST https://localhost:7070/api/v1/students
+Content-Type: application/json
+
+{
+  "studentId": "T021",
+  "name": "Test21",
+  "surname": "Student",
+  "dateOfBirth": "2005-01-21"
+}
+
+### Try to assign T021 to full class (should fail with 400)
+PATCH https://localhost:7070/api/v1/students/T021
 Content-Type: application/json
 
 {
@@ -215,13 +382,126 @@ Content-Type: application/json
 }
 
 ### ============================================
-### API VERSION TESTING
+### API VERSIONING TESTS
 ### ============================================
 
-### Test API Version in Header
-GET https://localhost:5001/api/v1/students
+### Test URL Segment Versioning (default)
+GET https://localhost:7070/api/v1/students
+
+### Test Header Versioning
+GET https://localhost:7070/api/v1/students
 X-Api-Version: 1.0
 
 ### Test without version (should use default v1.0)
-GET https://localhost:5001/api/v1/students
+GET https://localhost:7070/api/students
+
+### ============================================
+### COMBINED SCENARIOS
+### ============================================
+
+### Scenario 1: Create student, assign to class, update details, then unassign
+### Step 1: Create student
+POST https://localhost:7070/api/v1/students
+Content-Type: application/json
+
+{
+  "studentId": "SCENARIO1",
+  "name": "Scenario",
+  "surname": "TestUser",
+  "dateOfBirth": "2005-06-15"
+}
+
+### Step 2: Assign to class
+PATCH https://localhost:7070/api/v1/students/SCENARIO1
+Content-Type: application/json
+
+{
+  "schoolClassId": 1
+}
+
+### Step 3: Update student details while keeping class assignment
+PATCH https://localhost:7070/api/v1/students/SCENARIO1
+Content-Type: application/json
+
+{
+  "city": "Seattle",
+  "street": "123 Pine St",
+  "postalCode": "98101"
+}
+
+### Step 4: Get student to verify all updates
+GET https://localhost:7070/api/v1/students/SCENARIO1
+
+### Step 5: Unassign from class
+PATCH https://localhost:7070/api/v1/students/SCENARIO1
+Content-Type: application/json
+
+{
+  "schoolClassId": null
+}
+
+### Step 6: Verify student is unassigned
+GET https://localhost:7070/api/v1/students/SCENARIO1
+
+### Step 7: Cleanup - delete student
+DELETE https://localhost:7070/api/v1/students/SCENARIO1
+
+### ============================================
+### ERROR HANDLING TESTS
+### ============================================
+
+### Test 404 - Non-existent student
+GET https://localhost:7070/api/v1/students/DOESNOTEXIST
+
+### Test 404 - Non-existent class
+GET https://localhost:7070/api/v1/classes/999999
+
+### Test 400 - Invalid student data (empty required fields)
+POST https://localhost:7070/api/v1/students
+Content-Type: application/json
+
+{
+  "studentId": "",
+  "name": "",
+  "surname": "",
+  "dateOfBirth": "2005-01-01"
+}
+
+### Test 409 - Duplicate student ID
+POST https://localhost:7070/api/v1/students
+Content-Type: application/json
+
+{
+  "studentId": "S001",
+  "name": "Duplicate",
+  "surname": "User",
+  "dateOfBirth": "2005-01-01"
+}
+
+### ============================================
+### DATA VERIFICATION
+### ============================================
+
+### Get all students with class assignments
+GET https://localhost:7070/api/v1/students
+
+### Get all classes with student counts
+GET https://localhost:7070/api/v1/classes
+
+### Get specific class to see assigned students
+GET https://localhost:7070/api/v1/classes/1
+
+### ============================================
+### CLEANUP (Optional)
+### ============================================
+### Use these to reset the database during testing
+
+### Delete all test students (T001-T021)
+### Note: Execute these sequentially or create a script
+DELETE https://localhost:7070/api/v1/students/T001
+###
+DELETE https://localhost:7070/api/v1/students/T002
+###
+DELETE https://localhost:7070/api/v1/students/T003
+### Continue for all test students...
 
