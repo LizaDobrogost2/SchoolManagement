@@ -1,7 +1,6 @@
 using SchoolManagement.Models;
 using SchoolManagement.Services;
 using Asp.Versioning;
-using Asp.Versioning.Builder;
 
 namespace SchoolManagement.Endpoints;
 

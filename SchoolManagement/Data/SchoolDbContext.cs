@@ -25,8 +25,6 @@ public class SchoolDbContext : DbContext
 
     /// <summary>
     /// Configures the model using Fluent API through separate configuration classes.
-    /// This follows the Single Responsibility Principle - each configuration class
-    /// handles one entity's configuration.
     /// </summary>
     /// <param name="modelBuilder">The model builder.</param>
     protected override void OnModelCreating(ModelBuilder modelBuilder)

@@ -1,96 +1,120 @@
-# School Management API 
+# School Management API
 
-## Business Requirements 
+A .NET 9 Minimal API for managing Students and School Classes. 
 
- **Student Management**
-- Create/Edit/List/Delete students
-- Required: StudentId, Name, Surname, DateOfBirth
-- Optional: City, Street, PostalCode
-- Unique StudentId validation
+## Features
+- Student CRUD (with PATCH for partial updates + class assignment)
+- School Class CRUD (max 20 students constraint)
+- In-memory EF Core database (easy to swap to persistent store)
+- API Versioning (URL segment, header, media type readers)
+- Health Checks (/health, /health/live, /health/ready)
+- Swagger / OpenAPI (Development only)
+- Structured logging with Serilog
+- Global exception handling & ProblemDetails responses
 
- **School Class Management**
-- Create/Edit/List/Delete classes
-- Add/Remove students to/from classes
-- Required: Name, LeadingTeacher
-- Maximum 20 students per class
-
- **Technical Requirements**
+## Tech Stack
 - .NET 9 Minimal API
-- In-memory database with EF Core
-- No authentication/authorization required
+- EF Core InMemory
+- Serilog
+- Asp.Versioning
+- HealthChecks
+- Swagger / Swashbuckle
 
-## Quick Start
+## Project Structure
+```
+SchoolManagement/            API project
+  Configuration/            Modular service & middleware configuration
+  Data/                      DbContext + entity configurations
+  Endpoints/                Minimal API endpoint groups
+  Middleware/               Global exception handler
+  Models/                   Entities & DTOs
+  Services/                 Service layer + result wrappers
+  Repositories/             Repository abstractions & implementations
+SchoolManagement.Tests/     Unit & integration tests
+```
 
-### Using .NET CLI
+## Requirements
+- .NET 9 SDK
+- (Optional) Docker / Docker Compose
 
+## Quick Start (Local)
 ```bash
 cd SchoolManagement
 dotnet run
+# Swagger (Development): https://localhost:<port>/swagger
 ```
 
-### Using Docker
-
+## Quick Start (Docker Compose)
 ```bash
-# Using Docker Compose
 docker-compose up -d
+# API Base URL: http://localhost:5000/api/v1
+# Swagger UI:   http://localhost:5000/swagger (if Development config applied)
+# Health:       http://localhost:5000/health
+```
 
-Then open your browser to:
-- **Swagger UI**: `https://localhost:5001/swagger` (.NET) or `http://localhost:5000/swagger` (Docker)
-- **API Base URL**: `https://localhost:5001/api/v1` (.NET) or `http://localhost:5000/api/v1` (Docker)
-- **Health Check**: `http://localhost:5000/health` (Docker)
+## Configuration
+Logging levels are defined in `appsettings.json` with environment overrides (e.g. `appsettings.Development.json`). Serilog is configured early and enriched with request diagnostics.
+
+Switch database: replace `UseInMemoryDatabase` in `DatabaseConfiguration` with a provider (e.g. `UseSqlServer` or `UseSqlite`).
+
+## Health Endpoints
+- `/health`      Aggregate + JSON report
+- `/health/live` Liveness (always healthy if process alive)
+- `/health/ready` Readiness (tagged checks, currently self-check)
+
+## Logging
+Serilog request logging template:
+```
+HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed:0.0000} ms
+```
+Additional context: RequestHost, RequestScheme.
+
+## API Versioning
+Default version: v1.0. Version can be supplied via:
+- URL segment: `/api/v1/...`
+- Header: `X-Api-Version: 1.0`
+- Media type parameter: `Accept: application/json; version=1.0`
+
+## Endpoints (v1)
+### Students
+- GET    `/api/v1/students`
+- GET    `/api/v1/students/{id}`
+- POST   `/api/v1/students`
+- PUT    `/api/v1/students/{id}`
+- PATCH  `/api/v1/students/{id}` 
+- DELETE `/api/v1/students/{id}`
+
+### Classes
+- GET    `/api/v1/classes`
+- GET    `/api/v1/classes/{id}`
+- POST   `/api/v1/classes`
+- PUT    `/api/v1/classes/{id}`
+- PATCH  `/api/v1/classes/{id}`
+- DELETE `/api/v1/classes/{id}`
+
+### Assign / Unassign Student to Class
+Assign:
+```http
+PATCH /api/v1/students/S001
+Content-Type: application/json
+
+{
+  "schoolClassId": 1
+}
+```
+Unassign:
+```http
+PATCH /api/v1/students/S001
+Content-Type: application/json
+
+{
+  "schoolClassId": null
+}
+```
 
 ## Testing
-
+Run all tests:
 ```bash
 dotnet test
 ```
-## API Endpoints (v1)
-
-All endpoints are versioned. Current version: **v1.0**
-
-### Students
-- `GET /api/v1/students` - List all
-- `GET /api/v1/students/{id}` - Get by ID
-- `POST /api/v1/students` - Create
-- `PUT /api/v1/students/{id}` - Update (full)
-- `PATCH /api/v1/students/{id}` - Update (partial) - **Use for class assignments**
-- `DELETE /api/v1/students/{id}` - Delete
-
-### Classes
-- `GET /api/v1/classes` - List all
-- `GET /api/v1/classes/{id}` - Get by ID
-- `POST /api/v1/classes` - Create
-- `PUT /api/v1/classes/{id}` - Update (full)
-- `PATCH /api/v1/classes/{id}` - Update (partial)
-- `DELETE /api/v1/classes/{id}` - Delete
-
-### Assigning Students to Classes
-
-**Recommended approach** (RESTful):
-```http
-PATCH /api/v1/students/S001
-Content-Type: application/json
-
-{
-  "schoolClassId": 1  // Assign to class
-}
-```
-
-```http
-PATCH /api/v1/students/S001
-Content-Type: application/json
-
-{
-  "schoolClassId": null  // Unassign from class
-}
-```
-
-## Running the Application
-
-```bash
-cd SchoolManagement
-dotnet run
-```
-
-Access Swagger UI: `https://localhost:<port>/swagger`
 
