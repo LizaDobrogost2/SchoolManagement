@@ -2,7 +2,6 @@ using SchoolManagement.Common;
 using SchoolManagement.Extensions;
 using SchoolManagement.Models;
 using SchoolManagement.Repositories;
-using Microsoft.Extensions.Logging;
 
 namespace SchoolManagement.Services;
 
@@ -40,7 +39,7 @@ public class SchoolClassService : ISchoolClassService
     {
         _logger.LogInformation("Retrieving class with ID: {ClassId}", id);
         var schoolClass = await _classRepository.GetByIdWithStudentsAsync(id);
-        
+
         if (schoolClass == null)
         {
             _logger.LogWarning("Class not found: {ClassId}", id);
@@ -55,8 +54,7 @@ public class SchoolClassService : ISchoolClassService
     public async Task<ServiceResult<SchoolClassDto>> CreateClassAsync(CreateSchoolClassDto dto)
     {
         _logger.LogInformation("Creating new class: {ClassName}", dto.Name);
-        
-        // Validate required fields
+
         if (string.IsNullOrWhiteSpace(dto.Name) || string.IsNullOrWhiteSpace(dto.LeadingTeacher))
         {
             _logger.LogWarning("Class creation failed: missing required fields");
@@ -67,7 +65,7 @@ public class SchoolClassService : ISchoolClassService
         var schoolClass = dto.ToEntity();
         await _classRepository.AddAsync(schoolClass);
 
-        _logger.LogInformation("Successfully created class: {ClassId} - {ClassName} (Teacher: {Teacher})", 
+        _logger.LogInformation("Successfully created class: {ClassId} - {ClassName} (Teacher: {Teacher})",
             schoolClass.Id, schoolClass.Name, schoolClass.LeadingTeacher);
         return ServiceResult<SchoolClassDto>.Created(schoolClass.ToDto());
     }
@@ -76,7 +74,7 @@ public class SchoolClassService : ISchoolClassService
     {
         _logger.LogInformation("Updating class: {ClassId}", id);
         var schoolClass = await _classRepository.GetByIdAsync(id);
-        
+
         if (schoolClass == null)
         {
             _logger.LogWarning("Update failed: Class not found {ClassId}", id);
@@ -84,7 +82,6 @@ public class SchoolClassService : ISchoolClassService
                 string.Format(ValidationMessages.ClassNotFound, id));
         }
 
-        // Validate required fields
         if (string.IsNullOrWhiteSpace(dto.Name) || string.IsNullOrWhiteSpace(dto.LeadingTeacher))
         {
             _logger.LogWarning("Update failed: missing required fields for {ClassId}", id);
@@ -106,7 +103,7 @@ public class SchoolClassService : ISchoolClassService
     {
         _logger.LogInformation("Partially updating class: {ClassId}", id);
         var schoolClass = await _classRepository.GetByIdAsync(id);
-        
+
         if (schoolClass == null)
         {
             _logger.LogWarning("Patch failed: Class not found {ClassId}", id);
@@ -114,7 +111,6 @@ public class SchoolClassService : ISchoolClassService
                 string.Format(ValidationMessages.ClassNotFound, id));
         }
 
-        // Apply partial updates only for provided fields
         if (dto.Name != null)
         {
             if (string.IsNullOrWhiteSpace(dto.Name))
@@ -148,7 +144,7 @@ public class SchoolClassService : ISchoolClassService
     {
         _logger.LogInformation("Deleting class: {ClassId}", id);
         var schoolClass = await _classRepository.GetByIdWithStudentsAsync(id);
-        
+
         if (schoolClass == null)
         {
             _logger.LogWarning("Delete failed: Class not found {ClassId}", id);
@@ -156,7 +152,6 @@ public class SchoolClassService : ISchoolClassService
                 string.Format(ValidationMessages.ClassNotFound, id));
         }
 
-        // Remove class assignment from all students
         if (schoolClass.Students != null)
         {
             var studentCount = schoolClass.Students.Count;
