@@ -19,7 +19,6 @@ try
     builder.Services.AddSwaggerConfiguration();
     builder.Services.AddDatabaseConfiguration();
     builder.Services.AddApplicationServices();
-    builder.Services.AddHealthChecksConfiguration();
 
     var app = builder.Build();
 

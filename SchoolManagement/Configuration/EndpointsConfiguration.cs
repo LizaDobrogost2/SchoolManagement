@@ -14,8 +14,6 @@ public static class EndpointsConfiguration
         app.MapSchoolClassEndpoints()
             .WithApiVersionSet(apiVersionSet);
 
-        app.MapHealthEndpoints();
-
         return app;
     }
 }
