@@ -1,13 +1,12 @@
 # School Management API
 
-A .NET 9 Minimal API for managing Students and School Classes. 
+A .NET 9 Minimal API for managing Students and School Classes. Demonstrates clean separation of concerns (Endpoints, Services, Repositories), API Versioning, Serilog logging, and automated tests.
 
 ## Features
 - Student CRUD (with PATCH for partial updates + class assignment)
 - School Class CRUD (max 20 students constraint)
 - In-memory EF Core database (easy to swap to persistent store)
 - API Versioning (URL segment, header, media type readers)
-- Health Checks (/health, /health/live, /health/ready)
 - Swagger / OpenAPI (Development only)
 - Structured logging with Serilog
 - Global exception handling & ProblemDetails responses
@@ -17,7 +16,6 @@ A .NET 9 Minimal API for managing Students and School Classes.
 - EF Core InMemory
 - Serilog
 - Asp.Versioning
-- HealthChecks
 - Swagger / Swashbuckle
 
 ## Project Structure
@@ -49,18 +47,12 @@ dotnet run
 docker-compose up -d
 # API Base URL: http://localhost:5000/api/v1
 # Swagger UI:   http://localhost:5000/swagger (if Development config applied)
-# Health:       http://localhost:5000/health
 ```
 
 ## Configuration
 Logging levels are defined in `appsettings.json` with environment overrides (e.g. `appsettings.Development.json`). Serilog is configured early and enriched with request diagnostics.
 
 Switch database: replace `UseInMemoryDatabase` in `DatabaseConfiguration` with a provider (e.g. `UseSqlServer` or `UseSqlite`).
-
-## Health Endpoints
-- `/health`      Aggregate + JSON report
-- `/health/live` Liveness (always healthy if process alive)
-- `/health/ready` Readiness (tagged checks, currently self-check)
 
 ## Logging
 Serilog request logging template:
@@ -81,7 +73,7 @@ Default version: v1.0. Version can be supplied via:
 - GET    `/api/v1/students/{id}`
 - POST   `/api/v1/students`
 - PUT    `/api/v1/students/{id}`
-- PATCH  `/api/v1/students/{id}` 
+- PATCH  `/api/v1/students/{id}` (partial or class assignment)
 - DELETE `/api/v1/students/{id}`
 
 ### Classes
@@ -117,4 +109,3 @@ Run all tests:
 ```bash
 dotnet test
 ```
-
